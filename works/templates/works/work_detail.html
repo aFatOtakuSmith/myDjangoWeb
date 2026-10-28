@@ -4,140 +4,116 @@
 {% block title %}{{ work.title }} | 作品详情{% endblock %}
 
 {% block content %}
-<!-- 🌟 引入 KaTeX 数学公式的 CSS -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- 引入 KaTeX 数学公式的 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 
 <style>
     /* =========================================
-       页面整体布局
+       整体双栏布局
        ========================================= */
-    .detail-wrapper {
-        max-width: 900px;
+    .detail-layout {
+        display: flex;
+        gap: 30px;
+        max-width: 1200px;
         margin: 20px auto 60px auto;
+        align-items: flex-start;
     }
 
     /* 返回按钮 */
+    .back-btn-wrapper {
+        grid-column: 1 / -1;
+        margin-bottom: 10px;
+    }
     .back-btn {
         display: inline-flex;
         align-items: center;
         color: #0ea5e9;
         text-decoration: none;
         font-weight: 600;
-        margin-bottom: 24px;
         transition: all 0.3s;
+        font-family: 'Fira Code', monospace;
     }
     .back-btn:hover {
         transform: translateX(-4px);
         color: #0284c7;
     }
 
-    /* 顶部大封面 */
-    .detail-cover {
+    /* =========================================
+       左侧 80%：正文阅读区（排在前面）
+       ========================================= */
+    .detail-main {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        border-radius: 32px;
+        padding: 50px 60px;
+        box-shadow: 0 15px 40px rgba(14, 165, 233, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        min-width: 0;
+    }
+
+    /* 作品大封面（放在正文顶部） */
+    .work-cover-img {
         width: 100%;
         max-height: 450px;
         object-fit: cover;
-        border-radius: 24px;
-        box-shadow: 0 15px 40px rgba(14, 165, 233, 0.15);
-        margin-bottom: 30px;
-    }
-
-    /* 标题信息区 */
-    .detail-header {
-        text-align: center;
+        border-radius: 20px;
         margin-bottom: 40px;
-    }
-    .detail-title {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #082f49;
-        margin-bottom: 16px;
-        letter-spacing: 1px;
-    }
-    .detail-meta {
-        color: #64748b;
-        font-size: 0.9rem;
-        font-family: 'Fira Code', monospace;
-        margin-bottom: 20px;
-    }
-    .detail-tags {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .detail-tag {
-        background: rgba(14, 165, 233, 0.1);
-        color: #0ea5e9;
-        padding: 4px 14px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-family: 'Fira Code', monospace;
-        border: 1px solid rgba(14, 165, 233, 0.2);
-    }
-
-    /* 正文玻璃态卡片 */
-    .detail-content-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 24px;
-        padding: 40px 50px;
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
     }
 
     /* =========================================
-       🌟 Markdown 正文专属排版优化
+       🌟 Markdown 正文专属排版
        ========================================= */
     .markdown-content {
+        font-family: 'Noto Serif SC', serif;
         font-size: 1.05rem;
         color: #334155;
-        line-height: 1.8;
+        line-height: 1.9;
     }
     .markdown-content h1, 
     .markdown-content h2, 
     .markdown-content h3 {
+        font-family: 'Noto Serif SC', serif;
         color: #082f49;
-        margin-top: 1.5em;
+        margin-top: 1.8em;
         margin-bottom: 0.8em;
-        font-weight: 800;
+        font-weight: 700;
     }
     .markdown-content h2 {
         border-bottom: 2px dashed rgba(14, 165, 233, 0.2);
         padding-bottom: 10px;
     }
     .markdown-content p {
-        margin-bottom: 1.2em;
+        margin-bottom: 1.5em;
     }
     
-    /* 限制图片大小，防止撑爆屏幕 */
+    /* 图片 */
     .markdown-content img {
         max-width: 100% !important;
         height: auto !important;
         border-radius: 12px;
-        margin: 20px 0;
+        margin: 2em 0;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         display: block;
     }
     
-    /* 引用块样式 */
+    /* 引用块 */
     .markdown-content blockquote {
         border-left: 4px solid #0ea5e9;
         background: rgba(14, 165, 233, 0.05);
         padding: 16px 20px;
-        margin: 20px 0;
+        margin: 2em 0;
         color: #475569;
         border-radius: 0 8px 8px 0;
     }
-    .markdown-content blockquote p {
-        margin-bottom: 0;
-    }
     
-    /* 表格样式 */
+    /* 表格 */
     .markdown-content table {
         width: 100%;
         border-collapse: collapse;
-        margin: 20px 0;
+        margin: 2em 0;
         background: #fff;
         border-radius: 8px;
         overflow: hidden;
@@ -153,34 +129,38 @@
         font-weight: 700;
     }
     
-    /* 代码块样式 */
+    /* 🌟 代码块 - 清爽浅色版 */
     .markdown-content pre {
-        background: #0f172a;
-        color: #e2e8f0;
-        padding: 20px;
-        border-radius: 12px;
+        background: #f8fafc; 
+        color: #334155;      
+        padding: 20px 24px;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0; 
         overflow-x: auto;
-        margin: 20px 0;
+        margin: 2em 0;
+        font-family: 'Fira Code', monospace;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
     }
     .markdown-content code {
         font-family: 'Fira Code', monospace;
-        background: rgba(14, 165, 233, 0.1);
+        background: rgba(14, 165, 233, 0.08);
         color: #0284c7;
-        padding: 2px 6px;
-        border-radius: 4px;
+        padding: 2px 8px;
+        border-radius: 6px;
         font-size: 0.9em;
+        font-weight: 500;
     }
     .markdown-content pre code {
         background: transparent;
         color: inherit;
         padding: 0;
+        font-weight: 400;
     }
 
-    /* 🌟 任务列表（复选框）样式 */
+    /* 任务列表（复选框） */
     .markdown-content .task-list-item {
         list-style-type: none;
-        position: relative;
-        padding-left: 0;
+        margin-left: -20px;
         margin-bottom: 8px;
     }
     .markdown-content .task-list-item input[type="checkbox"] {
@@ -197,12 +177,10 @@
         cursor: pointer;
         transition: all 0.2s;
     }
-    /* 选中后的状态 */
     .markdown-content .task-list-item input[type="checkbox"]:checked {
         background-color: #0ea5e9;
         border-color: #0ea5e9;
     }
-    /* 打勾图标 */
     .markdown-content .task-list-item input[type="checkbox"]:checked::after {
         content: '✓';
         position: absolute;
@@ -212,118 +190,218 @@
         top: -1px;
         left: 2px;
     }
-    /* 取消原生列表的圆点 */
-    .markdown-content ul.task-list {
-        padding-left: 0;
-    }
 
-    /* 🌟 Mermaid 流程图居中 */
+    /* Mermaid 流程图 */
     .markdown-content .mermaid {
         text-align: center;
-        margin: 30px 0;
+        margin: 2em 0;
         background: #fff;
         padding: 20px;
-        border-radius: 12px;
+        border-radius: 16px;
         border: 1px solid #e2e8f0;
     }
 
-    /* 底部外部链接按钮 */
-    .detail-actions {
-        text-align: center;
-        margin-top: 40px;
+    /* =========================================
+       右侧 20%：作品信息栏（固定悬浮，排在后面）
+       ========================================= */
+    .detail-sidebar {
+        flex: 0 0 20%;
+        position: sticky;
+        top: 100px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.8);
     }
+
+    /* 分割线 */
+    .sidebar-divider {
+        height: 2px;
+        background: linear-gradient(90deg, rgba(14, 165, 233, 0.3) 0%, transparent 100%);
+        margin: 20px 0;
+        border-radius: 2px;
+    }
+
+    /* 元信息通用样式 */
+    .meta-item {
+        margin-bottom: 20px;
+    }
+    .meta-label {
+        display: block;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-family: 'Fira Code', monospace;
+        margin-bottom: 6px;
+        letter-spacing: 1px;
+    }
+    .meta-value {
+        color: #334155;
+    }
+
+    /* 标签组 */
+    .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    .detail-tag {
+        background: rgba(14, 165, 233, 0.1);
+        color: #0ea5e9;
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+        text-decoration: none;
+    }
+
+    /* 外部链接按钮 */
     .btn-external {
-        display: inline-flex;
+        display: flex;
+        justify-content: center;
         align-items: center;
         gap: 8px;
         background: linear-gradient(135deg, #0ea5e9, #3b82f6);
         color: #fff;
         text-decoration: none;
-        padding: 12px 32px;
-        border-radius: 50px;
+        padding: 10px 16px;
+        border-radius: 12px;
         font-weight: 600;
+        font-size: 0.85rem;
         box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
         transition: all 0.3s;
+        margin-top: 30px;
+        text-align: center;
     }
     .btn-external:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
         color: #fff;
     }
 
-    /* 手机端适配 */
-    @media (max-width: 768px) {
-        .detail-content-card { padding: 24px 20px; }
-        .detail-title { font-size: 1.8rem; }
+    /* =========================================
+       移动端适配
+       ========================================= */
+    @media (max-width: 992px) {
+        .detail-layout {
+            flex-direction: column;
+        }
+        /* 移动端下，让正文显示在上面，信息栏显示在下面 */
+        .detail-main {
+            order: 1;
+            width: 100%;
+            padding: 30px 20px;
+            border-radius: 24px;
+        }
+        .detail-sidebar {
+            order: 2;
+            width: 100%;
+            position: static;
+            padding: 30px 20px;
+        }
     }
 </style>
 
-<div class="container detail-wrapper">
-    
+<div class="container">
     <!-- 返回列表 -->
-    <a href="{% url 'works:works_list' %}" class="back-btn">← 返回作品列表</a>
+    <div class="back-btn-wrapper">
+        <a href="{% url 'works:works_list' %}" class="back-btn">← 返回作品列表</a>
+    </div>
 
-    <!-- 大封面 -->
-    {% if work.cover %}
-    <img src="{{ work.cover.url }}" alt="{{ work.title }}" class="detail-cover">
-    {% endif %}
-
-    <!-- 标题信息 -->
-    <div class="detail-header">
-        <h1 class="detail-title">{{ work.title }}</h1>
-        <div class="detail-meta">发布于 {{ work.created_at|date:"Y年m月d日" }}</div>
+    <div class="detail-layout">
         
-        {% if work.tag_list %}
-        <div class="detail-tags">
-            {% for tag in work.tag_list %}
-            <span class="detail-tag"># {{ tag }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+        <!-- 🌟 左侧：正文内容 (80%) -->
+        <main class="detail-main">
+            <!-- 封面大图（如果有） -->
+            {% if work.cover %}
+            <img src="{{ work.cover.url }}" alt="{{ work.title }}" class="work-cover-img">
+            {% endif %}
 
-    <!-- 正文内容 -->
-    <div class="detail-content-card">
-        <div class="markdown-content" id="markdown-body">
-            {{ work.description_html|safe }}
-        </div>
-    </div>
+            <!-- Markdown 正文 -->
+            <div class="markdown-content" id="markdown-body">
+                {{ work.description_html|safe }}
+            </div>
+        </main>
 
-    <!-- 底部动作区 -->
-    {% if work.link %}
-    <div class="detail-actions">
-        <a href="{{ work.link }}" target="_blank" rel="noopener" class="btn-external">
-            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-            访问外部项目主页
-        </a>
+        <!-- 🌟 右侧：作品信息栏 (20%) -->
+        <aside class="detail-sidebar">
+            
+            <!-- 标题 -->
+            <div class="meta-item">
+                <span class="meta-label">作品名称</span>
+                <div class="meta-value" style="font-size: 1.15rem; font-family: 'Noto Serif SC', serif; line-height: 1.5; font-weight: 700; color: #082f49;">
+                    {{ work.title }}
+                </div>
+            </div>
+            
+            <div class="sidebar-divider"></div>
+            
+            <!-- 简短简介 -->
+            {% if work.summary %}
+            <div class="meta-item">
+                <span class="meta-label">作品简介</span>
+                <div class="meta-value" style="font-size: 0.85rem; color: #64748b; font-weight: 400; line-height: 1.6; text-align: justify;">
+                    {{ work.summary }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 发布时间 -->
+            <div class="meta-item">
+                <span class="meta-label">发布时间</span>
+                <div class="meta-value" style="font-weight: 600; font-size: 0.9rem;">
+                    {{ work.created_at|date:"Y年m月d日" }}
+                </div>
+            </div>
+            
+            <!-- 标签 -->
+            {% if work.tag_list %}
+            <div class="meta-item">
+                <span class="meta-label">技术标签</span>
+                <div class="detail-tags">
+                    {% for tag in work.tag_list %}
+                    <span class="detail-tag"># {{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 外部链接按钮 -->
+            {% if work.link %}
+            <a href="{{ work.link }}" target="_blank" rel="noopener" class="btn-external">
+                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                访问项目主页
+            </a>
+            {% endif %}
+            
+        </aside>
+        
     </div>
-    {% endif %}
-
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<!-- 引入 KaTeX 数学公式脚本 -->
+<!-- KaTeX 数学公式渲染脚本 -->
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
 
+<!-- Mermaid 流程图及交互脚本 -->
 <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
     document.addEventListener("DOMContentLoaded", function() {
         
-        // ==========================================
         // 1. 让任务列表的复选框可以点击
-        // ==========================================
         const checkboxes = document.querySelectorAll('.task-list-item input[type="checkbox"]');
         checkboxes.forEach(cb => {
-            cb.removeAttribute('disabled'); // 移除只读属性
-            cb.style.cursor = 'pointer';    // 鼠标悬浮时变小手
+            cb.removeAttribute('disabled');
+            cb.style.cursor = 'pointer';
         });
 
-        // ==========================================
         // 2. 初始化 KaTeX 数学公式
-        // ==========================================
         if (typeof renderMathInElement !== 'undefined') {
             renderMathInElement(document.getElementById('markdown-body'), {
                 delimiters: [
@@ -332,17 +410,14 @@
                     {left: '\\[', right: '\\]', display: true},
                     {left: '\\(', right: '\\)', display: false}
                 ],
-                throwOnError: false,
-                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+                throwOnError: false
             });
         }
 
-        // ==========================================
         // 3. 初始化 Mermaid 流程图
-        // ==========================================
         mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
-        // 提取并转换 mermaid 代码块
+        // 自动识别由 Markdown 转换生成的 mermaid 代码块
         const codeBlocks = document.querySelectorAll('pre code.language-mermaid');
         codeBlocks.forEach(block => {
             const mermaidDiv = document.createElement('div');
@@ -351,7 +426,6 @@
             block.parentNode.replaceWith(mermaidDiv);
         });
 
-        // 执行渲染
         mermaid.run();
     });
 </script>

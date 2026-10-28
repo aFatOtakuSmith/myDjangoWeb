@@ -14,15 +14,16 @@
         --text-main: #0f172a;
         --text-muted: #475569;
         --accent-blue: #0ea5e9;
-        --accent-cyan: #06b6d4;
-        --glass-bg: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.8);
+        --deep-blue: #082f49;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(14, 165, 233, 0.15); /* 边框带上淡蓝色 */
         
-        background-color: #f8fafc;
+        /* 🌟 保持纯白背景，但在角落加入极淡的海洋蓝光晕 */
+        background-color: #ffffff;
         background-image: 
-            linear-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(14, 165, 233, 0.03) 1px, transparent 1px);
-        background-size: 30px 30px;
+            radial-gradient(circle at 10% 10%, rgba(224, 242, 254, 0.6) 0%, transparent 40%),
+            radial-gradient(circle at 90% 90%, rgba(186, 230, 253, 0.4) 0%, transparent 40%);
+        background-size: cover;
         background-position: center center;
         
         color: var(--text-main);
@@ -31,7 +32,7 @@
         min-height: 100vh;
         border-radius: 40px;
         margin-top: -20px;
-        box-shadow: inset 0 0 80px rgba(14, 165, 233, 0.05);
+        box-shadow: inset 0 0 80px rgba(14, 165, 233, 0.03);
     }
 
     .font-mono {
@@ -47,13 +48,13 @@
         flex-wrap: wrap;
         gap: 6px;
         margin-bottom: 60px;
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 6px;
         border-radius: 50px;
         border: 1px solid var(--glass-border);
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08), inset 0 0 0 1px rgba(255,255,255,0.5);
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
         max-width: fit-content;
         margin-left: auto;
         margin-right: auto;
@@ -109,13 +110,19 @@
         text-align: center;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 12px 35px rgba(14, 165, 233, 0.08), inset 0 2px 0 rgba(255,255,255,0.9);
+        box-shadow: 0 12px 35px rgba(14, 165, 233, 0.06);
         transition: all 0.4s ease;
+    }
+    /* 顶部蓝色亮条 */
+    .about-profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 4px;
+        background: linear-gradient(90deg, #38bdf8, #3b82f6);
     }
     .about-profile-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 20px 45px rgba(14, 165, 233, 0.15), inset 0 2px 0 rgba(255,255,255,0.9);
-        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 20px 45px rgba(14, 165, 233, 0.12);
     }
 
     .about-avatar {
@@ -123,8 +130,8 @@
         height: 120px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #ffffff;
-        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+        border: 4px solid #ffffff;
+        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15), 0 0 0 3px rgba(14, 165, 233, 0.1);
         margin-bottom: 20px;
         transition: transform 0.4s ease;
     }
@@ -133,14 +140,14 @@
     }
 
     .about-name {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         font-weight: 800;
-        color: #082f49;
+        color: var(--deep-blue);
         margin: 0 0 6px 0;
         letter-spacing: 1px;
     }
     .about-tagline {
-        color: var(--text-muted);
+        color: var(--accent-blue);
         font-size: 0.85rem;
         margin-bottom: 24px;
         font-family: 'Fira Code', monospace;
@@ -151,9 +158,9 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(16, 185, 129, 0.08);
-        color: #059669;
-        border: 1px solid rgba(16, 185, 129, 0.2);
+        background: rgba(14, 165, 233, 0.08);
+        color: #0284c7;
+        border: 1px solid rgba(14, 165, 233, 0.2);
         padding: 6px 16px;
         border-radius: 50px;
         font-size: 0.75rem;
@@ -165,9 +172,9 @@
         display: block;
         width: 6px;
         height: 6px;
-        background-color: #10b981;
+        background-color: #0ea5e9;
         border-radius: 50%;
-        box-shadow: 0 0 8px #10b981;
+        box-shadow: 0 0 8px #0ea5e9;
         animation: statusPulse 2s infinite;
     }
     @keyframes statusPulse {
@@ -186,8 +193,8 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        background: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(14, 165, 233, 0.1);
         padding: 12px 16px;
         border-radius: 12px;
         text-decoration: none;
@@ -198,7 +205,7 @@
         position: relative;
     }
     .contact-block:hover {
-        background: #ffffff;
+        background: #f0f9ff;
         border-color: rgba(14, 165, 233, 0.4);
         transform: translateX(4px);
         box-shadow: 0 6px 15px rgba(14, 165, 233, 0.1);
@@ -248,11 +255,11 @@
         background: linear-gradient(135deg, var(--accent-blue), #3b82f6);
         color: #fff;
         border: none;
-        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25);
     }
     .about-btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
     }
 
     /* 技能标签 */
@@ -262,11 +269,11 @@
         border: 1px solid var(--glass-border);
         border-radius: 24px;
         padding: 24px;
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.05);
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.04);
     }
     .about-skill-tags h2 {
-        font-size: 0.9rem;
-        color: #082f49;
+        font-size: 0.95rem;
+        color: var(--deep-blue);
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -275,9 +282,9 @@
     }
     .about-tag {
         display: inline-block;
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(14, 165, 233, 0.15);
-        color: #475569;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(14, 165, 233, 0.2);
+        color: #334155;
         padding: 5px 14px;
         border-radius: 8px;
         font-size: 0.75rem;
@@ -286,7 +293,7 @@
         font-family: 'Fira Code', monospace;
     }
     .about-tag:hover {
-        background: #f0f9ff;
+        background: #e0f2fe;
         border-color: var(--accent-blue);
         color: var(--accent-blue);
         transform: translateY(-1px);
@@ -316,9 +323,9 @@
 
     /* 标题样式 */
     .about-section h2 {
-        font-size: 1.25rem;
-        color: #082f49;
-        margin-bottom: 20px;
+        font-size: 1.3rem;
+        color: var(--deep-blue);
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -342,9 +349,9 @@
         margin-bottom: 16px;
     }
     .about-section p strong {
-        color: #082f49;
+        color: var(--deep-blue);
         font-weight: 700;
-        background: linear-gradient(120deg, rgba(14,165,233,0.1) 0%, rgba(14,165,233,0.1) 100%);
+        background: linear-gradient(120deg, rgba(14,165,233,0.12) 0%, rgba(14,165,233,0.12) 100%);
         padding: 0 4px;
         border-radius: 4px;
     }
@@ -365,11 +372,22 @@
         position: relative;
         overflow: hidden;
     }
+    .about-intent-item::after {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; height: 100%; width: 4px;
+        background: var(--accent-blue);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
     .about-intent-item:hover {
         background: #ffffff;
         border-color: rgba(14, 165, 233, 0.3);
         transform: translateY(-4px);
         box-shadow: 0 12px 25px rgba(14, 165, 233, 0.1);
+    }
+    .about-intent-item:hover::after {
+        opacity: 1;
     }
     .about-intent-label {
         display: block;
@@ -381,7 +399,7 @@
     .about-intent-value {
         display: block;
         font-size: 1rem;
-        color: #082f49;
+        color: var(--deep-blue);
         font-weight: 700;
     }
 
@@ -401,7 +419,7 @@
         top: 20px;
         bottom: -20px;
         width: 2px;
-        background: linear-gradient(180deg, rgba(14, 165, 233, 0.2), transparent);
+        background: linear-gradient(180deg, rgba(14, 165, 233, 0.3), transparent);
     }
     .about-experience-item:last-child::after {
         display: none;
@@ -416,24 +434,24 @@
         border-radius: 50%;
         background: #fff;
         border: 2px solid var(--accent-blue);
-        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
         z-index: 2;
     }
     
     .about-experience-header h3 {
         font-size: 1.1rem;
-        color: #082f49;
+        color: var(--deep-blue);
         margin: 0 0 8px 0;
         font-weight: 800;
     }
     .about-experience-meta {
         font-size: 0.8rem;
-        color: var(--accent-blue);
+        color: #0284c7;
         margin-bottom: 16px;
         display: inline-block;
         background: rgba(14, 165, 233, 0.08);
-        padding: 2px 10px;
-        border-radius: 4px;
+        padding: 4px 12px;
+        border-radius: 50px;
         font-family: 'Fira Code', monospace;
     }
     .about-experience-bullets {
@@ -467,10 +485,11 @@
     .about-skill-group:hover {
         background: #ffffff;
         box-shadow: 0 10px 25px rgba(14, 165, 233, 0.08);
+        border-color: rgba(14, 165, 233, 0.3);
     }
     .about-skill-group h3 {
         font-size: 0.95rem;
-        color: #082f49;
+        color: var(--deep-blue);
         margin-bottom: 16px;
         font-family: 'Fira Code', monospace;
         border-bottom: 1px dashed rgba(14, 165, 233, 0.2);
@@ -520,24 +539,28 @@
         content: '';
         position: absolute;
         top: 0; left: 0; width: 100%; height: 3px;
-        background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+        background: linear-gradient(90deg, var(--accent-blue), #60a5fa);
         opacity: 0;
         transition: opacity 0.3s;
     }
     .about-work-card:hover {
         transform: translateY(-6px);
         background: #ffffff;
-        border-color: transparent;
-        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.15);
+        border-color: rgba(14, 165, 233, 0.2);
+        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.12);
     }
     .about-work-card:hover::before {
         opacity: 1;
     }
     .about-work-card h3 {
-        color: #082f49;
+        color: var(--deep-blue);
         font-size: 1.05rem;
         margin: 0 0 10px 0;
         font-weight: 800;
+        transition: color 0.3s;
+    }
+    .about-work-card:hover h3 {
+        color: var(--accent-blue);
     }
     .about-work-card p {
         font-size: 0.85rem;
@@ -612,7 +635,7 @@
           </a>
         </div>
 
-        <!-- 下载按钮（已修复 HTML 结构并改为中文） -->
+        <!-- 下载按钮 -->
         <a class="about-btn about-btn-primary" href="{% static 'core/files/resume.pdf' %}" download>下载简历</a>
       </div>
 
@@ -669,11 +692,11 @@
 
         <article class="about-experience-item">
           <header class="about-experience-header">
-            <h3>智能追光系统 (Smart Lighting)</h3>
+            <h3>STM32平衡车系统 (Smart Lighting)</h3>
             <span class="about-experience-meta">主导开发者 · 2023.05 – 至今</span>
           </header>
           <ul class="about-experience-bullets">
-            <li>基于 ESP32-CAM 与 ESP8266 实现视觉识别与滑轨追光系统。</li>
+            <li>基于 STM32与 PID算法 实现的可以设置巡逻轨迹的平衡车系统。</li>
             <li>完成硬件选型、PCB 设计以及基于 FreeRTOS 的底层固件编写。</li>
             <li>开发配套的 Web 控制后台，实现局域网内低延迟控制与状态监控。</li>
           </ul>
@@ -728,11 +751,11 @@
         <h2>作品精选</h2>
         <div class="about-works-grid">
           <a class="about-work-card" href="/works">
-            <h3>智能追光系统</h3>
-            <p>结合 ESP32 与视觉算法的硬件项目。</p>
+            <h3>STM32的平衡车</h3>
+            <p>涉及PID算法的硬件项目。</p>
           </a>
           <a class="about-work-card" href="/works">
-            <h3>潮汐乐队主页</h3>
+            <h3>多春鱼乐队主页</h3>
             <p>沉浸式交互体验的 Django 全栈网站。</p>
           </a>
           <a class="about-work-card" href="/works">
