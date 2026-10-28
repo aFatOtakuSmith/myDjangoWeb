@@ -1,0 +1,299 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}小彩蛋{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================
+       整体布局
+       ========================================= */
+    .quotes-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+        width: 100%;
+        max-width: 100%; 
+        margin: 0 auto;
+        padding: 60px 30px 80px 20px; 
+    }
+
+    /* =========================================
+       左侧：悬浮目录
+       ========================================= */
+    .quotes-sidebar {
+        flex: 0 0 220px; 
+        width: 220px;
+        position: sticky;
+        top: 120px;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 24px 16px;
+        box-shadow: 0 15px 35px rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .sidebar-title {
+        font-family: 'Ma Shan Zheng', cursive, sans-serif;
+        font-size: 1.6rem;
+        color: #082f49;
+        text-align: center;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        border-bottom: 2px dashed rgba(14, 165, 233, 0.2);
+        padding-bottom: 16px;
+    }
+
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: #475569;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid transparent;
+    }
+
+    .category-item:hover, .category-item.active {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    /* =========================================
+       右侧：语录主展示区
+       ========================================= */
+    .quotes-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto; 
+        max-width: 1100px; 
+        width: 100%;
+    }
+
+    .quotes-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .quotes-header h1 {
+        font-family: 'Ma Shan Zheng', cursive;
+        font-size: 3.2rem;
+        color: #082f49;
+        letter-spacing: 4px;
+        margin-bottom: 12px;
+        text-shadow: 2px 2px 15px rgba(255, 255, 255, 0.8);
+    }
+    .quotes-header p {
+        color: #475569;
+        letter-spacing: 2px;
+        font-size: 1.05rem;
+        font-weight: 500;
+    }
+
+    .bubble-wall {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 20px; 
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    /* =========================================
+       🌟 气泡基础样式（再缩小一行的高度）
+       ========================================= */
+    .bubble-item {
+        position: relative;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 1);
+        border-radius: 16px; 
+        
+        padding: 12px 20px; 
+        
+        /* 🌟 高度缩小到 115px */
+        height: 115px; 
+        
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.08);
+        transition: transform 0.3s ease;
+        font-family: 'Noto Serif SC', serif;
+        color: #0c4a6e;
+        line-height: 1.5;
+        word-break: break-word; 
+        overflow-wrap: break-word;
+    }
+    
+    .bubble-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.15);
+    }
+
+    /* 气泡尾巴：左 */
+    .bubble-item.left { border-bottom-left-radius: 4px; }
+    .bubble-item.left::after {
+        content: ''; position: absolute; bottom: -1px; left: -1px;
+        border-left: 16px solid transparent; border-bottom: 16px solid rgba(255, 255, 255, 0.85);
+    }
+
+    /* 气泡尾巴：右 */
+    .bubble-item.right {
+        border-bottom-right-radius: 4px; 
+        background: rgba(224, 242, 254, 0.9); 
+        border-color: rgba(186, 230, 253, 1); 
+        color: #082f49;
+    }
+    .bubble-item.right::after {
+        content: ''; position: absolute; bottom: -1px; right: -1px;
+        border-right: 16px solid transparent; border-bottom: 16px solid rgba(224, 242, 254, 0.9);
+    }
+
+    /* =========================================
+       🌟 正文多行截断（改为只显示 2 行）
+       ========================================= */
+    .quote-content {
+        flex: 1; 
+        margin-bottom: 4px; 
+        font-size: 0.88rem; 
+        text-align: justify;
+        
+        /* 首行缩进 */
+        text-indent: 2em; 
+        
+        /* 多行省略号的三件套 */
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        
+        /* 🌟 1. 改为显示 3 行 */
+        -webkit-line-clamp: 3; 
+        
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+        /* 🌟 2. 行高稍微收紧到 1.45，确保 115px 高度完美装下 3 行文字 + 底部落款 */
+        line-height: 1.45; 
+    }
+
+    /* 作者落款 */
+    .quote-author {
+        display: block;
+        font-size: 0.75rem; 
+        color: #64748b;
+        text-align: right; 
+        font-family: 'Fira Code', monospace;
+        border-top: 1px dashed rgba(14, 165, 233, 0.2); 
+        padding-top: 5px;
+        margin-top: auto; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .quote-author::before {
+        content: '—— ';
+    }
+
+    /* 空状态 */
+    .empty-state {
+        grid-column: 1 / -1;
+        width: 100%;
+        text-align: center;
+        color: #64748b;
+        padding: 40px 20px;
+        background: rgba(255,255,255,0.6);
+        border-radius: 16px;
+        border: 1px dashed #cbd5e1;
+        font-size: 1rem;
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .quotes-layout {
+            flex-direction: column;
+            padding: 30px 20px;
+            align-items: center;
+        }
+        .quotes-sidebar {
+            position: static;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        .category-list {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .bubble-wall {
+            grid-template-columns: 1fr; 
+        }
+        .bubble-item {
+            height: auto;
+            min-height: 110px;
+        }
+        .quote-content {
+            font-size: 0.95rem; 
+            /* 手机端可以展示三行，空间比较宽裕 */
+            -webkit-line-clamp: 3; 
+        }
+    }
+</style>
+
+<div class="quotes-layout">
+    
+    <aside class="quotes-sidebar">
+        <div class="sidebar-title">开始拾荒</div>
+        <div class="category-list">
+            {% for cat in categories %}
+            <a href="?type=sentence_{{ cat.id }}" class="category-item {% if current_type_id == 'sentence_'|add:cat.id|stringformat:'s' %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% empty %}
+            <div class="text-center text-secondary small py-3">暂无分类</div>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <main class="quotes-main">
+        
+        <div class="quotes-header">
+            <h1>收集些有用没用的</h1>
+            <p>偶尔翻着看看挺有意思</p>
+        </div>
+
+        <div class="bubble-wall">
+            {% for quote in quotes %}
+                <div class="bubble-item {% if forloop.counter|divisibleby:2 %}right{% else %}left{% endif %}">
+                    <div class="quote-content">
+                        {{ quote.content }}
+                    </div>
+                    
+                    {% if quote.author %}
+                    <span class="quote-author">{{ quote.author }}</span>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    这个分类下暂时没有语录，去后台写点什么吧。
+                </div>
+            {% endfor %}
+        </div>
+
+    </main>
+
+</div>
+{% endblock %}

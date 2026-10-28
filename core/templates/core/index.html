@@ -67,16 +67,16 @@
         100% { transform: rotate(1deg) translateY(-5px); }
     }
 
-    /* 🌟 新增：古籍名言的排版样式 */
+    /* 古籍名言的排版样式 */
     .quote-text {
         font-family: 'Ma Shan Zheng', cursive, serif;
         font-size: 1.5rem;
-        color: #1e3a8a; /* 稍微深一点的蓝 */
+        color: #1e3a8a;
         letter-spacing: 3px;
         margin-top: 20px;
         opacity: 0;
         animation: fadeInText 1.5s ease-out forwards;
-        animation-delay: 1.5s; /* 在诗句出现后再慢慢浮现 */
+        animation-delay: 1.5s;
         text-shadow: 1px 1px 5px rgba(255,255,255,0.6);
     }
     @media (min-width: 768px) {
@@ -96,7 +96,7 @@
         animation-delay: 2s;
     }
 
-    /* 🌟 新增：祝福语排版 */
+    /* 祝福语排版 */
     .blessing-text {
         font-size: 1.2rem;
         color: #0c4a6e;
@@ -246,7 +246,77 @@
         0% { transform: scaleY(1) translateX(0); }
         100% { transform: scaleY(0.9) translateX(20px); }
     }
+
+    /* =========================================
+       7. 🌟 右上角：悬浮彩蛋小气泡
+       ========================================= */
+    .bubble-wrapper {
+        position: fixed;
+        top: 14px;
+        right: 15px; /* 悬浮在屏幕最右上角 */
+        z-index: 1050; /* 层级非常高，漂浮在导航栏上方 */
+        margin: 0;
+    }
+
+    .floating-bubble {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px; /* 尺寸做得比导航栏稍小，像个小标签 */
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 1);
+        border-radius: 50px;
+        text-decoration: none;
+        color: #0c4a6e;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.15);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        
+        /* 气泡漂浮动画 */
+        animation: floatBubble 3s ease-in-out infinite;
+    }
+
+    .floating-bubble:hover {
+        background: #ffffff;
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);
+        color: #0ea5e9;
+        animation-play-state: paused;
+    }
+
+    .bubble-icon {
+        font-size: 1.1rem;
+        animation: spinBubble 6s linear infinite;
+    }
+
+    @keyframes floatBubble {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+
+    @keyframes spinBubble {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* 手机端适配：防止挡住顶部折叠菜单，直接隐藏彩蛋 */
+    @media (max-width: 991px) {
+        .bubble-wrapper {
+            display: none;
+        }
+    }
 </style>
+
+<!-- 🌟 悬浮在右上角的彩蛋（不属于导航菜单） -->
+<div class="bubble-wrapper">
+    <a href="{% url 'core:quotes_list' %}" class="floating-bubble">
+        <span class="bubble-icon">🫧</span>
+        彩蛋
+    </a>
+</div>
 
 <div class="hero-section text-center">
     <div class="wind-layer"></div>
@@ -260,7 +330,7 @@
             流向未知远方
         </div>
         
-        <!-- 🌟 插入第一句：古籍名言 -->
+        <!-- 古籍名言 -->
         <div class="quote-text">
             悟已往之不谏，知来者之可追
         </div>
@@ -268,7 +338,7 @@
         <!-- 分割线 -->
         <div class="divider"></div>
 
-        <!-- 🌟 插入第二句：长句祝福 -->
+        <!-- 长句祝福 -->
         <p class="blessing-text mb-4">
             愿你在时光的海上，稳稳掌住自己的舵；<br>
             不悔来路风浪，只向心之所往。

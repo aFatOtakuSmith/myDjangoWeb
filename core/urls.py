@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.index, name='index'),             # 首页
     path('about/', views.about, name='about'),       # 关于
     path('contact/', views.contact, name='contact'), # 联系
+    path('quotes/', views.quotes_list, name='quotes_list'),
 ]
