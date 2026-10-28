@@ -1,16 +1,17 @@
 /* =========================================
-   1. 全局背景与排版
+   1. 全局背景与排版 (更清透的色调)
    ========================================= */
 body {
+    /* 🌟 修改：将原本的深蓝渐变改成了以白色为主的极浅渐变，显得更淡雅 */
     background-image: 
-        linear-gradient(rgba(224, 242, 254, 0.7), rgba(125, 211, 252, 0.6)),
+        linear-gradient(rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.7)),
         url('../images/SeaandBeach.jpg');
     background-size: cover;
     background-position: center center;
     background-attachment: fixed;
     background-repeat: no-repeat;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #334155;
+    color: #475569; /* 🌟 修改：文字颜色稍微调浅一点点，更柔和 */
     min-height: 100vh;
     overflow-x: hidden; 
     
@@ -36,7 +37,7 @@ img {
 
 /* 文字选中颜色 */
 ::selection {
-    background: rgba(56, 189, 248, 0.3);
+    background: rgba(186, 230, 253, 0.6); /* 选中色变淡 */
     color: #082f49;
 }
 
@@ -46,8 +47,8 @@ img {
 .click-ripple {
     position: fixed;
     border-radius: 50%;
-    border: 2px solid rgba(56, 189, 248, 0.8);
-    background: rgba(56, 189, 248, 0.2);       
+    border: 2px solid rgba(56, 189, 248, 0.6); /* 边框变淡 */
+    background: rgba(56, 189, 248, 0.15);       /* 背景变淡 */
     pointer-events: none;
     transform: translate(-50%, -50%) scale(0);
     animation: rippleEffect 0.5s ease-out forwards; 
@@ -63,34 +64,80 @@ img {
    3. 玻璃拟态导航栏
    ========================================= */
 .navbar-ocean {
-    background-color: rgba(255, 255, 255, 0.7) !important;
+    background-color: rgba(255, 255, 255, 0.85) !important; /* 导航栏更白 */
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.05); /* 阴影变淡 */
 }
 .navbar-ocean .navbar-brand {
-    color: #0369a1;
+    color: #0c4a6e;
     font-weight: 800;
     letter-spacing: 1px;
 }
 .navbar-ocean .nav-link {
-    color: #0284c7;
+    color: #0369a1;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 .navbar-ocean .nav-link:hover {
-    color: #0c4a6e;
+    color: #0ea5e9;
     transform: translateY(-2px);
 }
 
 /* =========================================
-   4. 页脚
+   4. 页脚 (纯净渐变底，无边框)
    ========================================= */
 .footer-ocean {
-    background-color: #0f172a;
-    color: #bae6fd;
+    /* 纯净的从底边到顶边的淡蓝色渐变 */
+    background: linear-gradient(to top, rgba(224, 242, 254, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+    
+    /* 彻底移除边框和阴影 */
+    border: none !important;
+    box-shadow: none !important;
+    
+    color: #64748b; 
+    font-size: 0.75rem; 
+    letter-spacing: 1px;
+    padding: 15px 0; /* 稍微加大一点底部留白，让渐变过渡更自然 */
+    
+    /* 保证悬停变色时背景和文字平滑过渡 */
+    transition: background 0.4s ease, color 0.4s ease; 
 }
 
+/* 第一行版权文字 */
+.footer-ocean p:first-child {
+    color: #0284c7;
+    font-weight: 500;
+    margin-bottom: 3px;
+    transition: color 0.4s ease;
+}
+
+/* 第二行：极客代码字体 */
+.footer-ocean .small {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem !important;
+    color: #94a3b8 !important; 
+    letter-spacing: 2px;
+    transition: color 0.4s ease;
+}
+
+/* =========================================
+   🌟 鼠标悬停时的状态 (颜色加深，无边框)
+   ========================================= */
+.footer-ocean:hover {
+    /* 悬停时渐变加深，像海水涨潮 */
+    background: linear-gradient(to top, rgba(186, 230, 253, 0.9) 0%, rgba(224, 242, 254, 0.2) 100%);
+}
+
+/* 悬停时：第一行文字变深蓝 */
+.footer-ocean:hover p:first-child {
+    color: #0c4a6e; 
+}
+
+/* 悬停时：第二行文字变深灰 */
+.footer-ocean:hover .small {
+    color: #64748b !important; 
+}
 /* =========================================
    5. 左侧悬挂装饰器
    ========================================= */
@@ -111,8 +158,8 @@ img {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9), transparent);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
 }
 .hanging-item {
     position: absolute;
@@ -130,20 +177,20 @@ img {
     animation: glowPulse 2s infinite alternate;
 }
 @keyframes glowPulse {
-    0% { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6)); }
-    100% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 1)); }
+    0% { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.4)); }
+    100% { filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.8)); }
 }
 
 /* =========================================
-   6. 玻璃卡片 (配合 JS 的 3D 倾斜)
+   6. 玻璃卡片
    ========================================= */
 .glass-card {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.5); /* 卡片更白 */
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.9);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.08); /* 阴影变淡 */
     transition: box-shadow 0.3s ease, background 0.3s ease;
     will-change: transform; 
     transform-style: preserve-3d;
@@ -151,8 +198,8 @@ img {
     z-index: 1; 
 }
 .glass-card:hover {
-    box-shadow: 0 15px 35px rgba(14, 165, 233, 0.3);
-    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 30px rgba(14, 165, 233, 0.15);
+    background: rgba(255, 255, 255, 0.75);
 }
 
 /* =========================================
@@ -162,12 +209,12 @@ img {
     width: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #e0f2fe;
+    background: #f8fafc;
 }
 ::-webkit-scrollbar-thumb {
-    background: #38bdf8;
+    background: #bae6fd; /* 滚动条变淡 */
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #0284c7;
+    background: #7dd3fc;
 }

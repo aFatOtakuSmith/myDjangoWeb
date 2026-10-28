@@ -8,25 +8,96 @@
 
 <style>
     /* =========================================
-       1. 顶部主打作品大展示框
+       整体布局
        ========================================= */
+    .works-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 40px;
+        max-width: 1400px;
+        margin: 30px auto 80px auto;
+        padding: 0 20px;
+    }
+
+    /* =========================================
+       左侧 220px 目录栏（悬浮）
+       ========================================= */
+    .works-sidebar {
+        flex: 0 0 220px;
+        width: 220px;
+        position: sticky;
+        top: 100px;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 24px 16px;
+        box-shadow: 0 15px 35px rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .sidebar-title {
+        font-family: 'Ma Shan Zheng', cursive, sans-serif;
+        font-size: 1.6rem;
+        color: #082f49;
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px dashed rgba(14, 165, 233, 0.2);
+        letter-spacing: 2px;
+    }
+
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: #475569;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid transparent;
+    }
+
+    .category-item:hover, .category-item.active {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    /* =========================================
+       右侧内容区
+       ========================================= */
+    .works-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* 顶部主打作品大展示框 */
     .featured-hero {
         position: relative;
-        display: block; /* 确保作为链接时能撑开 */
-        max-width: 1200px;
-        margin: 20px auto 60px auto;
-        border-radius: 30px;
+        display: block;
+        width: 100%;
+        margin-bottom: 40px;
+        border-radius: 24px;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(14, 165, 233, 0.25);
+        box-shadow: 0 15px 35px rgba(14, 165, 233, 0.2);
         background: #0f172a;
-        text-decoration: none; /* 去除链接下划线 */
+        text-decoration: none;
     }
     .featured-hero img {
         width: 100%;
-        height: 500px;
+        height: 380px;
         object-fit: cover;
         opacity: 0.85;
-        transition: transform 0.8s ease;
+        transition: transform 0.6s ease;
     }
     .featured-hero:hover img {
         transform: scale(1.03);
@@ -34,8 +105,8 @@
     .featured-overlay {
         position: absolute;
         bottom: 0; left: 0; right: 0;
-        padding: 60px 40px 40px;
-        background: linear-gradient(180deg, transparent, rgba(8, 47, 73, 0.9));
+        padding: 40px 30px 30px;
+        background: linear-gradient(180deg, transparent, rgba(8, 47, 73, 0.95));
         color: #fff;
         display: flex;
         flex-direction: column;
@@ -50,57 +121,32 @@
         border-radius: 4px;
         font-size: 0.8rem;
         font-family: 'Fira Code', monospace;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         width: fit-content;
-        backdrop-filter: blur(4px);
     }
     .featured-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 800;
-        margin-bottom: 12px;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        margin-bottom: 10px;
     }
     .featured-desc {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #e2e8f0;
-        max-width: 700px;
-        line-height: 1.6;
-        margin-bottom: 24px;
-    }
-    .featured-btn {
-        display: inline-block;
-        background: #0ea5e9;
-        color: #fff;
-        padding: 10px 24px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s;
-        width: fit-content;
-    }
-    .featured-hero:hover .featured-btn {
-        background: #38bdf8;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+        max-width: 600px;
+        line-height: 1.5;
+        margin: 0;
     }
 
-    /* =========================================
-       2. 下方作品卡片网格
-       ========================================= */
+    /* 下方作品网格 */
     .works-section {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .works-header {
-        text-align: center;
-        margin-bottom: 40px;
+        width: 100%;
     }
     .works-header h2 {
         font-family: 'Ma Shan Zheng', cursive, sans-serif;
-        font-size: 2rem;
+        font-size: 1.8rem;
         color: #082f49;
-        letter-spacing: 3px;
-        text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.8);
+        margin-bottom: 24px;
+        letter-spacing: 2px;
     }
 
     .works-grid {
@@ -113,7 +159,6 @@
         position: relative;
         background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
         border: 1px solid rgba(255, 255, 255, 0.8);
         border-radius: 16px;
         overflow: hidden;
@@ -125,12 +170,11 @@
         flex-direction: column;
     }
     .work-card:hover {
-        transform: translateY(-8px);
+        transform: translateY(-6px);
         box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
         border-color: rgba(14, 165, 233, 0.3);
     }
 
-    /* 卡片图片 */
     .work-cover {
         width: 100%;
         height: 180px;
@@ -148,7 +192,6 @@
         transform: scale(1.08);
     }
 
-    /* 悬浮浮现遮罩层 */
     .work-hover-mask {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -188,7 +231,6 @@
         font-family: 'Fira Code', monospace;
     }
 
-    /* 卡片底部信息 */
     .work-info {
         padding: 20px;
         flex: 1;
@@ -211,70 +253,120 @@
         font-family: 'Fira Code', monospace;
         margin-top: auto;
     }
+
+    /* 响应式 */
+    @media (max-width: 992px) {
+        .works-layout {
+            flex-direction: column;
+        }
+        .works-sidebar {
+            position: static;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .category-list {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .featured-hero img {
+            height: 250px;
+        }
+    }
 </style>
 
-<!-- ========== 1. 顶部主打作品 ========== -->
-{% if featured_work %}
-<!-- 🌟 修复：直接把外层的 href 改为跳转详情页，去掉内部多余的 <a> -->
-<a href="{% url 'works:work_detail' featured_work.pk %}" class="featured-hero">
-    {% if featured_work.cover %}
-    <img src="{{ featured_work.cover.url }}" alt="{{ featured_work.title }}" loading="lazy" decoding="async">
-    {% else %}
-    <div style="width:100%; height:500px; background: linear-gradient(135deg, #0f172a, #0c4a6e);"></div>
-    {% endif %}
+<div class="works-layout">
     
-    <div class="featured-overlay">
-        <div class="featured-tag">// FEATURED PROJECT</div>
-        <h1 class="featured-title">{{ featured_work.title }}</h1>
-        <p class="featured-desc">{{ featured_work.summary }}</p>
-        <!-- 内部的 div 无需再用 a 标签，因为外层已经是链接了 -->
-        <div class="featured-btn">查看项目详情 →</div>
-    </div>
-</a>
-{% endif %}
+    <!-- 左侧：分类目录 -->
+    <aside class="works-sidebar">
+        <div class="sidebar-title">作品集</div>
+        <div class="category-list">
+            
+            <!-- 🌟 新增：全部作品选项 -->
+            <a href="?cat=all" class="category-item {% if current_cat_id == 'all' %}active{% endif %}">
+                全部作品
+            </a>
 
-<!-- ========== 2. 下方网格作品 ========== -->
-<div class="works-section">
-    <div class="works-header">
-        <h2>更多作品</h2>
-    </div>
+            <!-- 循环显示各个作品集 -->
+            {% for cat in categories %}
+            <a href="?cat={{ cat.id }}" class="category-item {% if current_cat_id == cat.id|stringformat:'s' %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% empty %}
+            <div class="text-center text-secondary small py-3">暂无其他作品集</div>
+            {% endfor %}
+        </div>
+    </aside>
 
-    <div class="works-grid">
-        {% for work in works %}
-        <!-- 🌟 修复：把 href 改为跳转详情页 -->
-        <a href="{% url 'works:work_detail' work.pk %}" class="work-card">
-            <!-- 封面图区域 -->
-            <div class="work-cover">
-                {% if work.cover %}
-                <img src="{{ work.cover.url }}" alt="{{ work.title }}" loading="lazy" decoding="async">
-                {% else %}
-                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8;">暂无封面</div>
-                {% endif %}
-                
-                <!-- 悬浮浮现的简介层 -->
-                <div class="work-hover-mask">
-                    <p>{{ work.summary }}</p>
-                    {% if work.tag_list %}
-                    <div class="hover-tags">
-                        {% for tag in work.tag_list %}
-                        <span>{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- 底部标题区域 -->
-            <div class="work-info">
-                <h3 class="work-title">{{ work.title }}</h3>
-                <div class="work-time">{{ work.created_at|date:"Y.m.d" }}</div>
+    <!-- 右侧：作品展示区 -->
+    <main class="works-main">
+        
+        <!-- 1. 顶部主打作品 -->
+        {% if featured_work %}
+        <a href="{% url 'works:work_detail' featured_work.pk %}" class="featured-hero">
+            {% if featured_work.cover %}
+            <img src="{{ featured_work.cover.url }}" alt="{{ featured_work.title }}" loading="lazy">
+            {% else %}
+            <div style="width:100%; height:380px; background: linear-gradient(135deg, #0f172a, #0c4a6e);"></div>
+            {% endif %}
+            
+            <div class="featured-overlay">
+                <div class="featured-tag">// FEATURED</div>
+                <h1 class="featured-title">{{ featured_work.title }}</h1>
+                <p class="featured-desc">{{ featured_work.summary }}</p>
             </div>
         </a>
-        {% empty %}
-        <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 40px;">
-            还没有作品，快去后台添加吧！
+        {% endif %}
+
+        <!-- 2. 下方网格作品 -->
+        <div class="works-section">
+            <div class="works-header">
+                <h2>
+                    {% if current_cat_id == 'all' %}
+                        全部作品
+                    {% else %}
+                        {% for cat in categories %}
+                            {% if current_cat_id == cat.id|stringformat:'s' %}{{ cat.name }}{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </h2>
+            </div>
+
+            <div class="works-grid">
+                {% for work in works %}
+                <a href="{% url 'works:work_detail' work.pk %}" class="work-card">
+                    <div class="work-cover">
+                        {% if work.cover %}
+                        <img src="{{ work.cover.url }}" alt="{{ work.title }}" loading="lazy">
+                        {% else %}
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8;">暂无封面</div>
+                        {% endif %}
+                        
+                        <div class="work-hover-mask">
+                            <p>{{ work.summary }}</p>
+                            {% if work.tag_list %}
+                            <div class="hover-tags">
+                                {% for tag in work.tag_list %}
+                                <span>{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="work-info">
+                        <h3 class="work-title">{{ work.title }}</h3>
+                        <div class="work-time">{{ work.created_at|date:"Y.m.d" }}</div>
+                    </div>
+                </a>
+                {% empty %}
+                <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 40px;">
+                    该作品集下还没有作品，快去后台添加吧！
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endfor %}
-    </div>
+
+    </main>
 </div>
 {% endblock %}

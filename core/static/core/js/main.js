@@ -67,12 +67,14 @@ document.addEventListener("DOMContentLoaded", function() {
             const rotateY = ((x - centerX) / centerX) * 10;
             
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-            card.style.boxShadow = `${-rotateY}px ${rotateX}px 30px rgba(14, 165, 233, 0.3)`;
+            // 🌟 修改：把 0.3 改成了 0.15，让 3D 倾斜时的发光阴影变得柔和
+            card.style.boxShadow = `${-rotateY}px ${rotateX}px 30px rgba(14, 165, 233, 0.15)`;
         });
 
         card.addEventListener('mouseleave', () => {
             card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
-            card.style.boxShadow = `0 10px 30px rgba(14, 165, 233, 0.15)`;
+            // 🌟 修改：恢复时的阴影也变淡
+            card.style.boxShadow = `0 8px 24px rgba(14, 165, 233, 0.08)`;
         });
     });
 
