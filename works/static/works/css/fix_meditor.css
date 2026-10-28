@@ -1,0 +1,131 @@
+/* =========================================
+   Django 5 专属：暴力修复 mdeditor 弹窗错位
+   ========================================= */
+
+/* 弹窗整体容器：居中、圆角、阴影 */
+.editormd-dialog-container {
+    width: 500px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    background: #fff !important;
+    overflow: hidden !important;
+}
+
+/* 弹窗头部 */
+.editormd-dialog-header {
+    background: #f8fafc !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+/* 表单内容区：使用 Flex 纵向排列 */
+.editormd-dialog-container .editormd-form {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 20px !important;
+    gap: 15px !important; /* 统一间距 */
+}
+
+/* 修复每一行的标签 */
+.editormd-dialog-container .editormd-form label {
+    display: block !important;
+    margin-bottom: 5px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    font-size: 14px !important;
+}
+
+/* 修复所有输入框：强制占满 100% 宽度 */
+.editormd-dialog-container .editormd-form input[type="text"] {
+    display: block !important;
+    width: 100% !important;
+    height: 38px !important;
+    padding: 8px 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s !important;
+}
+
+.editormd-dialog-container .editormd-form input[type="text"]:focus {
+    border-color: #0ea5e9 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
+}
+
+/* 🌟 重点：修复被挤压的“本地上传”按钮区域 */
+.editormd-dialog-container .editormd-file-input {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    margin-top: 5px !important;
+}
+
+/* 隐藏原本丑陋的原生文件选择框，扩大点击热区 */
+.editormd-dialog-container .editormd-file-input input[type="file"] {
+    position: absolute !important;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+}
+
+/* 把“本地上传”伪装成一个全宽的蓝色按钮 */
+.editormd-dialog-container .editormd-upload-btn {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 40px !important;
+    background: #0ea5e9 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    margin-top: 5px !important;
+    box-sizing: border-box !important;
+}
+
+.editormd-dialog-container .editormd-upload-btn:hover {
+    background: #0284c7 !important;
+}
+
+/* 底部确定/取消按钮区 */
+.editormd-dialog-footer {
+    padding: 15px 20px !important;
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+}
+
+.editormd-dialog-footer button {
+    height: 36px !important;
+    padding: 0 20px !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    border: 1px solid transparent !important;
+}
+
+.editormd-dialog-footer button.editormd-btn-primary {
+    background: #0ea5e9 !important;
+    color: #fff !important;
+}
+.editormd-dialog-footer button.editormd-btn-primary:hover {
+    background: #0284c7 !important;
+}
+
+.editormd-dialog-footer button:not(.editormd-btn-primary) {
+    background: #fff !important;
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+}

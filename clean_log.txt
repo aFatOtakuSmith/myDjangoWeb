@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/aFatOtaku/newTravel/mydearweb/clean_temps.py", line 25, in <module>
+    clean_temp_folder()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/home/aFatOtaku/newTravel/mydearweb/clean_temps.py", line 6, in clean_temp_folder
+    temp_dir = os.path.join(settings.MEDIA_ROOT, 'temps')
+                            ^^^^^^^^^^^^^^^^^^^
+  File "/home/aFatOtaku/newTravel/venv/lib/python3.14/site-packages/django/conf/__init__.py", line 81, in __getattr__
+    self._setup(name)
+    ~~~~~~~~~~~^^^^^^
+  File "/home/aFatOtaku/newTravel/venv/lib/python3.14/site-packages/django/conf/__init__.py", line 61, in _setup
+    raise ImproperlyConfigured(
+    ...<4 lines>...
+    )
+django.core.exceptions.ImproperlyConfigured: Requested setting MEDIA_ROOT, but settings are not configured. You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
+文件夹 /home/aFatOtaku/newTravel/mydearweb/media/temps 不存在，无需清理。
+没有发现超过 24 小时的废弃临时图片。
+没有发现超过 24 小时的废弃临时图片。

@@ -1,0 +1,96 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ share.title }} | 生活分享{% endblock %}
+
+{% block content %}
+<style>
+    /* 文章阅读页面的排版，纯白卡片，适合长文阅读 */
+    .detail-container {
+        max-width: 820px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 50px 60px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #0ea5e9;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+    }
+    .back-link:hover {
+        transform: translateX(-4px);
+        color: #0284c7;
+    }
+    .detail-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        line-height: 1.4;
+        margin-bottom: 20px;
+    }
+    .detail-meta {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 30px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-cover {
+        width: 100%;
+        max-height: 480px;
+        object-fit: cover;
+        border-radius: 16px;
+        margin-bottom: 36px;
+    }
+    .detail-content {
+        font-size: 1.1rem;
+        color: #333;
+        line-height: 1.9;
+        letter-spacing: 0.5px;
+    }
+    /* 让 p 标签有段间距 */
+    .detail-content p {
+        margin-bottom: 1.5em;
+    }
+    
+    @media (max-width: 768px) {
+        .detail-container { padding: 30px 20px; margin: 10px auto; }
+        .detail-title { font-size: 1.8rem; }
+    }
+</style>
+
+<div class="container">
+    <div class="detail-container">
+        <!-- 返回按钮 -->
+        <a href="{% url 'moments:moments_list' %}#life-share" onclick="if(document.referrer && document.referrer.includes(window.location.host)) { event.preventDefault(); history.back(); }" class="back-link">← 返回列表</a>
+        
+        <!-- 标题 -->
+        <h1 class="detail-title">{{ share.title }}</h1>
+        
+        <!-- 时间和信息 -->
+        <div class="detail-meta">
+            <span>发布于 {{ share.created_at|date:"Y年m月d日" }}</span>
+            <span>大约 {{ share.read_time }} 分钟</span>
+        </div>
+
+        <!-- 封面大图（有图才显示） -->
+        {% if share.cover %}
+        <img src="{{ share.cover.url }}" class="detail-cover" alt="{{ share.title }}">
+        {% endif %}
+
+        <!-- 正文内容：使用 linebreaks 自动把换行转换成 <p> 标签 -->
+        <div class="detail-content">
+            {{ share.content|linebreaks }}
+        </div>
+    </div>
+</div>
+{% endblock %}

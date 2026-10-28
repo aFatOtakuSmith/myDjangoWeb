@@ -1,0 +1,173 @@
+/* =========================================
+   1. 全局背景与排版
+   ========================================= */
+body {
+    background-image: 
+        linear-gradient(rgba(224, 242, 254, 0.7), rgba(125, 211, 252, 0.6)),
+        url('../images/SeaandBeach.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #334155;
+    min-height: 100vh;
+    overflow-x: hidden; 
+    
+    /* 自定义鼠标指针 */
+    cursor: url('../images/cursor-default.png') 2 2, auto;
+}
+
+/* 可点击元素的鼠标指针 */
+a, button, .nav-link, .glass-card, .life-item, .member-card, .btn-filter, .btn-card-action {
+    cursor: url('../images/cursor-pointer.png') 8 8, pointer !important;
+}
+
+/* 文本保持 I 型指针 */
+p, h1, h2, h3, h4, h5, h6, .life-item-title, .life-item-summary {
+    cursor: text;
+}
+
+/* 防止拖拽图片 */
+img {
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* 文字选中颜色 */
+::selection {
+    background: rgba(56, 189, 248, 0.3);
+    color: #082f49;
+}
+
+/* =========================================
+   2. 水波涟漪点击特效
+   ========================================= */
+.click-ripple {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.8);
+    background: rgba(56, 189, 248, 0.2);       
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rippleEffect 0.5s ease-out forwards; 
+    z-index: 999999; 
+}
+
+@keyframes rippleEffect {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* =========================================
+   3. 玻璃拟态导航栏
+   ========================================= */
+.navbar-ocean {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+.navbar-ocean .navbar-brand {
+    color: #0369a1;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.navbar-ocean .nav-link {
+    color: #0284c7;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.navbar-ocean .nav-link:hover {
+    color: #0c4a6e;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   4. 页脚
+   ========================================= */
+.footer-ocean {
+    background-color: #0f172a;
+    color: #bae6fd;
+}
+
+/* =========================================
+   5. 左侧悬挂装饰器
+   ========================================= */
+.hanging-wrapper {
+    position: fixed;
+    left: 30px; 
+    top: 50%;
+    transform: translateY(-50%);
+    height: 70vh; 
+    width: 80px; 
+    z-index: 1000;
+    pointer-events: none; 
+}
+.hanging-string {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.hanging-item {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 45px;  
+    height: 45px; 
+    top: 0;
+    will-change: top, transform;
+}
+.hanging-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: glowPulse 2s infinite alternate;
+}
+@keyframes glowPulse {
+    0% { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6)); }
+    100% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 1)); }
+}
+
+/* =========================================
+   6. 玻璃卡片 (配合 JS 的 3D 倾斜)
+   ========================================= */
+.glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+    will-change: transform; 
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 1; 
+}
+.glass-card:hover {
+    box-shadow: 0 15px 35px rgba(14, 165, 233, 0.3);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   7. 自定义滚动条
+   ========================================= */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #e0f2fe;
+}
+::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #0284c7;
+}

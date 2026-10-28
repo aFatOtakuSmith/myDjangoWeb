@@ -1,0 +1,358 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ work.title }} | 作品详情{% endblock %}
+
+{% block content %}
+<!-- 🌟 引入 KaTeX 数学公式的 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+
+<style>
+    /* =========================================
+       页面整体布局
+       ========================================= */
+    .detail-wrapper {
+        max-width: 900px;
+        margin: 20px auto 60px auto;
+    }
+
+    /* 返回按钮 */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        color: #0ea5e9;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 24px;
+        transition: all 0.3s;
+    }
+    .back-btn:hover {
+        transform: translateX(-4px);
+        color: #0284c7;
+    }
+
+    /* 顶部大封面 */
+    .detail-cover {
+        width: 100%;
+        max-height: 450px;
+        object-fit: cover;
+        border-radius: 24px;
+        box-shadow: 0 15px 40px rgba(14, 165, 233, 0.15);
+        margin-bottom: 30px;
+    }
+
+    /* 标题信息区 */
+    .detail-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .detail-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #082f49;
+        margin-bottom: 16px;
+        letter-spacing: 1px;
+    }
+    .detail-meta {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-family: 'Fira Code', monospace;
+        margin-bottom: 20px;
+    }
+    .detail-tags {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .detail-tag {
+        background: rgba(14, 165, 233, 0.1);
+        color: #0ea5e9;
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-family: 'Fira Code', monospace;
+        border: 1px solid rgba(14, 165, 233, 0.2);
+    }
+
+    /* 正文玻璃态卡片 */
+    .detail-content-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        padding: 40px 50px;
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
+    }
+
+    /* =========================================
+       🌟 Markdown 正文专属排版优化
+       ========================================= */
+    .markdown-content {
+        font-size: 1.05rem;
+        color: #334155;
+        line-height: 1.8;
+    }
+    .markdown-content h1, 
+    .markdown-content h2, 
+    .markdown-content h3 {
+        color: #082f49;
+        margin-top: 1.5em;
+        margin-bottom: 0.8em;
+        font-weight: 800;
+    }
+    .markdown-content h2 {
+        border-bottom: 2px dashed rgba(14, 165, 233, 0.2);
+        padding-bottom: 10px;
+    }
+    .markdown-content p {
+        margin-bottom: 1.2em;
+    }
+    
+    /* 限制图片大小，防止撑爆屏幕 */
+    .markdown-content img {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 12px;
+        margin: 20px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: block;
+    }
+    
+    /* 引用块样式 */
+    .markdown-content blockquote {
+        border-left: 4px solid #0ea5e9;
+        background: rgba(14, 165, 233, 0.05);
+        padding: 16px 20px;
+        margin: 20px 0;
+        color: #475569;
+        border-radius: 0 8px 8px 0;
+    }
+    .markdown-content blockquote p {
+        margin-bottom: 0;
+    }
+    
+    /* 表格样式 */
+    .markdown-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .markdown-content th, .markdown-content td {
+        border: 1px solid #e2e8f0;
+        padding: 12px 16px;
+        text-align: left;
+    }
+    .markdown-content th {
+        background: #f0f9ff;
+        color: #082f49;
+        font-weight: 700;
+    }
+    
+    /* 代码块样式 */
+    .markdown-content pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 12px;
+        overflow-x: auto;
+        margin: 20px 0;
+    }
+    .markdown-content code {
+        font-family: 'Fira Code', monospace;
+        background: rgba(14, 165, 233, 0.1);
+        color: #0284c7;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    .markdown-content pre code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+    }
+
+    /* 🌟 任务列表（复选框）样式 */
+    .markdown-content .task-list-item {
+        list-style-type: none;
+        position: relative;
+        padding-left: 0;
+        margin-bottom: 8px;
+    }
+    .markdown-content .task-list-item input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #94a3b8;
+        border-radius: 4px;
+        margin-right: 8px;
+        vertical-align: middle;
+        position: relative;
+        top: -2px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    /* 选中后的状态 */
+    .markdown-content .task-list-item input[type="checkbox"]:checked {
+        background-color: #0ea5e9;
+        border-color: #0ea5e9;
+    }
+    /* 打勾图标 */
+    .markdown-content .task-list-item input[type="checkbox"]:checked::after {
+        content: '✓';
+        position: absolute;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        top: -1px;
+        left: 2px;
+    }
+    /* 取消原生列表的圆点 */
+    .markdown-content ul.task-list {
+        padding-left: 0;
+    }
+
+    /* 🌟 Mermaid 流程图居中 */
+    .markdown-content .mermaid {
+        text-align: center;
+        margin: 30px 0;
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* 底部外部链接按钮 */
+    .detail-actions {
+        text-align: center;
+        margin-top: 40px;
+    }
+    .btn-external {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: #fff;
+        text-decoration: none;
+        padding: 12px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        transition: all 0.3s;
+    }
+    .btn-external:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.5);
+        color: #fff;
+    }
+
+    /* 手机端适配 */
+    @media (max-width: 768px) {
+        .detail-content-card { padding: 24px 20px; }
+        .detail-title { font-size: 1.8rem; }
+    }
+</style>
+
+<div class="container detail-wrapper">
+    
+    <!-- 返回列表 -->
+    <a href="{% url 'works:works_list' %}" class="back-btn">← 返回作品列表</a>
+
+    <!-- 大封面 -->
+    {% if work.cover %}
+    <img src="{{ work.cover.url }}" alt="{{ work.title }}" class="detail-cover">
+    {% endif %}
+
+    <!-- 标题信息 -->
+    <div class="detail-header">
+        <h1 class="detail-title">{{ work.title }}</h1>
+        <div class="detail-meta">发布于 {{ work.created_at|date:"Y年m月d日" }}</div>
+        
+        {% if work.tag_list %}
+        <div class="detail-tags">
+            {% for tag in work.tag_list %}
+            <span class="detail-tag"># {{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 正文内容 -->
+    <div class="detail-content-card">
+        <div class="markdown-content" id="markdown-body">
+            {{ work.description_html|safe }}
+        </div>
+    </div>
+
+    <!-- 底部动作区 -->
+    {% if work.link %}
+    <div class="detail-actions">
+        <a href="{{ work.link }}" target="_blank" rel="noopener" class="btn-external">
+            <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+            访问外部项目主页
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- 引入 KaTeX 数学公式脚本 -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // ==========================================
+        // 1. 让任务列表的复选框可以点击
+        // ==========================================
+        const checkboxes = document.querySelectorAll('.task-list-item input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.removeAttribute('disabled'); // 移除只读属性
+            cb.style.cursor = 'pointer';    // 鼠标悬浮时变小手
+        });
+
+        // ==========================================
+        // 2. 初始化 KaTeX 数学公式
+        // ==========================================
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(document.getElementById('markdown-body'), {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '\\(', right: '\\)', display: false}
+                ],
+                throwOnError: false,
+                ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+            });
+        }
+
+        // ==========================================
+        // 3. 初始化 Mermaid 流程图
+        // ==========================================
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+        // 提取并转换 mermaid 代码块
+        const codeBlocks = document.querySelectorAll('pre code.language-mermaid');
+        codeBlocks.forEach(block => {
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.textContent = block.textContent;
+            block.parentNode.replaceWith(mermaidDiv);
+        });
+
+        // 执行渲染
+        mermaid.run();
+    });
+</script>
+{% endblock %}

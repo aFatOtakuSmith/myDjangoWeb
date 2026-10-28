@@ -1,0 +1,338 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}联系我 | Where Time Meets the Sea{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================
+       1. 页面标题
+       ========================================= */
+    .contact-title {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    .contact-title h1 {
+        font-family: 'Ma Shan Zheng', cursive, sans-serif;
+        font-size: 3rem;
+        color: #082f49;
+        letter-spacing: 4px;
+        text-shadow: 2px 2px 15px rgba(255, 255, 255, 0.8);
+        margin-bottom: 12px;
+    }
+    .contact-title p {
+        color: #0c4a6e;
+        font-size: 1.05rem;
+        letter-spacing: 1px;
+        opacity: 0.85;
+    }
+
+    /* =========================================
+       2. 作者名片大卡片
+       ========================================= */
+    .author-profile-card {
+        max-width: 900px;
+        margin: 0 auto 60px auto;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 30px;
+        padding: 50px;
+        box-shadow: 0 15px 40px rgba(14, 165, 233, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .author-profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(14, 165, 233, 0.25);
+    }
+
+    /* 头像 */
+    .author-avatar-large {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #ffffff;
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3), 0 0 0 4px rgba(56, 189, 248, 0.2);
+        flex-shrink: 0;
+    }
+
+    /* 名片信息区 */
+    .author-info {
+        flex: 1;
+    }
+    .author-info h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0c4a6e;
+        margin-bottom: 10px;
+    }
+    .author-info .bio {
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 24px;
+    }
+
+    /* 联系方式按钮组 */
+    .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .social-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        background: #ffffff;
+        color: #0369a1;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        cursor: pointer; /* 确保 button 鼠标为小手 */
+        outline: none;
+    }
+    .social-btn:hover {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: #ffffff;
+        border-color: transparent;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(14, 165, 233, 0.35);
+    }
+    .social-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+    }
+
+    /* 🌟 新增：复制成功后的按钮状态（绿色） */
+    .social-btn.copied {
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        color: #ffffff !important;
+        border-color: transparent !important;
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35) !important;
+    }
+
+    /* =========================================
+       3. 友情链接区
+       ========================================= */
+    .friends-section {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .friends-title {
+        text-align: center;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #082f49;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+    }
+    .friends-title::before,
+    .friends-title::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #7dd3fc, transparent);
+        border-radius: 2px;
+    }
+
+    /* 友链卡片 */
+    .friend-card {
+        display: block;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        padding: 24px;
+        text-decoration: none;
+        transition: all 0.35s ease;
+        height: 100%;
+    }
+    .friend-card:hover {
+        background: #ffffff;
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.2);
+        border-color: rgba(56, 189, 248, 0.5);
+    }
+    
+    .friend-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+    .friend-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e0f2fe;
+    }
+    .friend-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0c4a6e;
+        margin: 0;
+    }
+    .friend-desc {
+        font-size: 0.88rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* 手机端适配 */
+    @media (max-width: 768px) {
+        .author-profile-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 40px 20px;
+            gap: 20px;
+        }
+        .social-links {
+            justify-content: center;
+        }
+        .contact-title h1 { font-size: 2.5rem; }
+    }
+</style>
+
+<div class="container py-5">
+    
+    <!-- 页面标题 -->
+    <div class="contact-title">
+        <h1>联系我</h1>
+        <p>如果你也对海浪、代码和音乐感兴趣，欢迎随时交流</p>
+    </div>
+
+    <!-- 作者名片 -->
+    <div class="author-profile-card">
+        <!-- 这里换成你自己的头像 -->
+        <img src="{% static 'core/images/author-avatar.jpg' %}" alt="作者头像" class="author-avatar-large">
+        
+        <div class="author-info">
+            <h2>aFatOtaku</h2>
+            <p class="bio">
+                你好！我是这个网站的作者。白天是敲代码的开发者，晚上是沉浸在旋律里的听歌狂。<br>
+                我喜欢用文字记录生活中的小确幸，也喜欢在开源世界里探索。如果你有任何问题、建议，或者只是想打个招呼，随时可以找我！
+            </p>
+            
+            <div class="social-links">
+                <!-- 🌟 修改后的 Email 按钮 -->
+                <button class="social-btn" id="copy-email-btn" data-email="afathousesmith@gmail.com" title="点击复制邮箱地址">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    <span id="email-text">我的邮箱</span>
+                </button>
+                <!-- GitHub -->
+                <a href="https://github.com/aFatOtakuSmith" target="_blank" class="social-btn" title="我的 GitHub">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                    GitHub
+                </a>
+                <!-- Bilibili (可选) -->
+                <a href="https://space.bilibili.com/349377312" target="_blank" class="social-btn" title="Bilibili">
+                    <svg viewBox="0 0 24 24"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/></svg>
+                    Bilibili
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 友情链接区 -->
+    <div class="friends-section">
+        <h3 class="friends-title">友情链接</h3>
+        
+        <div class="row g-4">
+            <!-- 测试友链 1 -->
+            <div class="col-md-6">
+                <a href="https://example.com/test1" target="_blank" class="friend-card">
+                    <div class="friend-header">
+                        <img src="{% static 'core/images/test-avatar-1.jpg' %}" alt="测试头像1" class="friend-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Test1&background=0ea5e9&color=fff'">
+                        <h4 class="friend-name">测试链接 1</h4>
+                    </div>
+                    <p class="friend-desc">这是一个测试用的友情链接，用于占位和预览排版效果。</p>
+                </a>
+            </div>
+            
+            <!-- 测试友链 2 -->
+            <div class="col-md-6">
+                <a href="https://example.com/test2" target="_blank" class="friend-card">
+                    <div class="friend-header">
+                        <img src="{% static 'core/images/test-avatar-2.jpg' %}" alt="测试头像2" class="friend-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Test2&background=3b82f6&color=fff'">
+                        <h4 class="friend-name">测试链接 2</h4>
+                    </div>
+                    <p class="friend-desc">这是另一个测试用的友情链接，用于测试文字过长时的截断效果。</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const copyBtn = document.getElementById('copy-email-btn');
+        const emailText = document.getElementById('email-text');
+        
+        if (copyBtn) {
+            // 自动从按钮的 data-email 属性中读取邮箱
+            const emailAddress = copyBtn.getAttribute('data-email');
+
+            copyBtn.addEventListener('click', function() {
+                // 1. 尝试使用现代剪贴板 API (HTTPS 或 localhost)
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(emailAddress).then(showSuccess).catch(() => fallbackCopy(emailAddress));
+                } else {
+                    // 2. HTTP 环境降级使用 execCommand
+                    fallbackCopy(emailAddress);
+                }
+            });
+
+            function fallbackCopy(text) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.top = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch (err) {
+                    alert('复制失败，请手动复制：' + text);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            function showSuccess() {
+                copyBtn.classList.add('copied');
+                emailText.innerText = '已复制！';
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    emailText.innerText = '复制邮箱';
+                }, 2000);
+            }
+        }
+    });
+</script>
+{% endblock %}

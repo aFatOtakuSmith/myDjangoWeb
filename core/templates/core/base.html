@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}我的个人网站{% endblock %}</title>
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- 自定义 CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-ocean sticky-top">
+        <div class="container">
+            <a class="navbar-brand fs-4" href="{% url 'core:index' %}">🌊 Where Time Meets the Sea</a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-2">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:index' %}">首页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'works:works_list' %}">作品</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'blog:blog_list' %}">博客</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'moments:moments_list' %}">动态</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:contact' %}">联系</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}">关于</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 左侧悬挂装饰器 -->
+    <div class="hanging-wrapper d-none d-md-block" id="hangingWrapper">
+        <div class="hanging-string"></div>
+        <div class="hanging-item" id="hangingItem">
+            <img src="{% static 'core/images/light.png' %}" alt="Light">
+        </div>
+    </div>
+
+    <!-- 页面主体内容 -->
+    <main class="container py-5 flex-grow-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer-ocean text-center py-4 mt-auto">
+        <div class="container">
+            <p class="mb-0">© {% now "Y" %} 我的个人网站. 保留所有权利.</p>
+            <p class="small mb-0 mt-2" style="color: #64748b;">Powered by Django & 海风</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 自定义 JS -->
+    <script src="{% static 'core/js/main.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

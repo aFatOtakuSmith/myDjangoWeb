@@ -1,0 +1,328 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Time and Tide | Home{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================
+       1. 首页主视觉区 (Hero Section)
+       ========================================= */
+    .hero-section {
+        position: relative;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(125, 211, 252, 0.15) 50%, rgba(56, 189, 248, 0.3) 100%);
+        border-radius: 40px;
+        padding: 100px 20px;
+        margin-top: -10px;
+        overflow: hidden;
+        box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.3);
+    }
+
+    /* 动态风之图层 */
+    .wind-layer {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: 
+            radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 40%),
+            radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+        background-size: 150% 150%;
+        animation: windBlow 15s linear infinite alternate;
+        z-index: 0; pointer-events: none;
+    }
+    @keyframes windBlow {
+        0% { transform: translateX(-5%) scale(1); opacity: 0.6; }
+        50% { transform: translateX(10%) scale(1.1); opacity: 0.8; }
+        100% { transform: translateX(-5%) scale(1); opacity: 0.6; }
+    }
+
+    /* =========================================
+       2. 诗意文案
+       ========================================= */
+    .poetic-text {
+        font-family: 'Ma Shan Zheng', cursive, sans-serif;
+        font-size: 3rem;
+        color: #082f49;
+        line-height: 1.6;
+        text-shadow: 2px 2px 15px rgba(255, 255, 255, 0.8);
+        
+        opacity: 0; 
+        animation: 
+            fadeInText 2s ease-out forwards, 
+            textSway 4s ease-in-out infinite alternate; 
+        animation-delay: 0.5s, 2.5s; 
+        transform-origin: bottom center; 
+    }
+    @media (min-width: 768px) {
+        .poetic-text { font-size: 4.5rem; }
+    }
+
+    @keyframes fadeInText {
+        0% { opacity: 0; transform: translateY(30px); filter: blur(5px); }
+        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    @keyframes textSway {
+        0% { transform: rotate(-1deg) translateY(0); }
+        100% { transform: rotate(1deg) translateY(-5px); }
+    }
+
+    /* 🌟 新增：古籍名言的排版样式 */
+    .quote-text {
+        font-family: 'Ma Shan Zheng', cursive, serif;
+        font-size: 1.5rem;
+        color: #1e3a8a; /* 稍微深一点的蓝 */
+        letter-spacing: 3px;
+        margin-top: 20px;
+        opacity: 0;
+        animation: fadeInText 1.5s ease-out forwards;
+        animation-delay: 1.5s; /* 在诗句出现后再慢慢浮现 */
+        text-shadow: 1px 1px 5px rgba(255,255,255,0.6);
+    }
+    @media (min-width: 768px) {
+        .quote-text { font-size: 2rem; }
+    }
+
+    /* 发光渐变分割线 */
+    .divider {
+        width: 150px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+        border-radius: 2px;
+        margin: 25px auto;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+        opacity: 0;
+        animation: fadeInText 1.5s ease-out forwards;
+        animation-delay: 2s;
+    }
+
+    /* 🌟 新增：祝福语排版 */
+    .blessing-text {
+        font-size: 1.2rem;
+        color: #0c4a6e;
+        font-weight: 500;
+        line-height: 1.8;
+        letter-spacing: 1px;
+        opacity: 0;
+        animation: fadeInText 1.5s ease-out forwards;
+        animation-delay: 2.5s;
+    }
+
+    /* =========================================
+       3. 顶部大按钮
+       ========================================= */
+    .btn-gradient-ocean {
+        display: inline-block;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #0ea5e9 100%);
+        background-size: 200% auto;
+        box-shadow: 0 10px 20px rgba(14, 165, 233, 0.4), inset 0 0 0 1px rgba(255,255,255,0.3);
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 2px;
+        cursor: pointer;
+        border: none;
+        margin-top: 20px;
+        opacity: 0;
+        animation: fadeInText 1.5s ease-out forwards;
+        animation-delay: 3s;
+    }
+    .btn-gradient-ocean:hover {
+        color: #ffffff;
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.6), inset 0 0 0 1px rgba(255,255,255,0.6);
+        background-position: right center;
+    }
+    .btn-gradient-ocean::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: all 0.6s ease;
+    }
+    .btn-gradient-ocean:hover::before {
+        left: 100%;
+    }
+
+    /* =========================================
+       4. 图标容器 & 海浪摇晃特效
+       ========================================= */
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: center; 
+    }
+    
+    .glass-card:hover .icon-box {
+        background: linear-gradient(135deg, #fff, #e0f2fe);
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
+        animation: waveShake 1.5s ease-in-out infinite; 
+    }
+
+    @keyframes waveShake {
+        0% { transform: scale(1.1) rotate(0deg) translateY(0); }
+        25% { transform: scale(1.1) rotate(-10deg) translateY(-2px); }
+        50% { transform: scale(1.1) rotate(10deg) translateY(2px); }
+        75% { transform: scale(1.1) rotate(-5deg) translateY(-1px); }
+        100% { transform: scale(1.1) rotate(0deg) translateY(0); }
+    }
+
+    /* 卡片标题悬停渐变 */
+    .card-title-hover {
+        color: #0c4a6e;
+        transition: all 0.3s ease;
+        font-weight: 800;
+    }
+    .glass-card:hover .card-title-hover {
+        background: linear-gradient(90deg, #0c4a6e, #0ea5e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* =========================================
+       5. 卡片底部的小圆角按钮
+       ========================================= */
+    .btn-card-action {
+        display: inline-block;
+        padding: 8px 28px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0369a1;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(56, 189, 248, 0.6);
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 4px 10px rgba(14, 165, 233, 0.1);
+    }
+
+    .btn-card-action:hover {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: white;
+        border-color: transparent;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+    }
+
+    /* =========================================
+       6. 双层 SVG 波浪
+       ========================================= */
+    .wave-container {
+        position: absolute;
+        bottom: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; z-index: 0;
+    }
+    .wave-container svg {
+        display: block; width: calc(100% + 1.3px); height: 100px;
+    }
+    .shape-fill-1 {
+        fill: #7dd3fc; opacity: 0.3;
+        animation: waveMove1 10s ease-in-out infinite alternate;
+    }
+    .shape-fill-2 {
+        fill: #38bdf8; opacity: 0.2;
+        animation: waveMove2 8s ease-in-out infinite alternate;
+    }
+    @keyframes waveMove1 {
+        0% { transform: scaleY(1) translateX(0); }
+        100% { transform: scaleY(1.2) translateX(-20px); }
+    }
+    @keyframes waveMove2 {
+        0% { transform: scaleY(1) translateX(0); }
+        100% { transform: scaleY(0.9) translateX(20px); }
+    }
+</style>
+
+<div class="hero-section text-center">
+    <div class="wind-layer"></div>
+
+    <!-- 文案区 -->
+    <div class="container mb-5 pb-5 position-relative z-2">
+        <!-- 诗句 -->
+        <div class="poetic-text mt-4">
+            过去美丽时光<br>
+            顺着海浪<br>
+            流向未知远方
+        </div>
+        
+        <!-- 🌟 插入第一句：古籍名言 -->
+        <div class="quote-text">
+            悟已往之不谏，知来者之可追
+        </div>
+
+        <!-- 分割线 -->
+        <div class="divider"></div>
+
+        <!-- 🌟 插入第二句：长句祝福 -->
+        <p class="blessing-text mb-4">
+            愿你在时光的海上，稳稳掌住自己的舵；<br>
+            不悔来路风浪，只向心之所往。
+        </p>
+
+        <!-- 顶部大按钮 -->
+        <a href="#explore-section" class="btn-gradient-ocean">开启探索之旅</a>
+    </div>
+
+    <!-- 三个入口卡片 -->
+    <div class="container position-relative z-2" id="explore-section">
+        <div class="row g-4 justify-content-center">
+            
+            <div class="col-md-4">
+                <div class="glass-card h-100 p-4 d-flex flex-column align-items-center">
+                    <div class="icon-box">⛵</div>
+                    <h4 class="card-title-hover mb-3">我的作品</h4>
+                    <p class="text-secondary small mb-4 flex-grow-1">把做过的项目收在这里，<br>每一件都藏着一段故事。</p>
+                    <a href="{% url 'works:works_list' %}" class="btn-card-action mt-auto">登船查看</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="glass-card h-100 p-4 d-flex flex-column align-items-center">
+                    <div class="icon-box">📖</div>
+                    <h4 class="card-title-hover mb-3">技术博客</h4>
+                    <p class="text-secondary small mb-4 flex-grow-1">记录学到的技术与踩过的坑，<br>愿能照亮同路的人。</p>
+                    <a href="{% url 'blog:blog_list' %}" class="btn-card-action mt-auto">翻开日记</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="glass-card h-100 p-4 d-flex flex-column align-items-center">
+                    <div class="icon-box">🎸</div>
+                    <h4 class="card-title-hover mb-3">日常动态</h4>
+                    <p class="text-secondary small mb-4 flex-grow-1">把生活里的碎片轻轻拾起，<br>写成一段段日常。</p>
+                    <a href="{% url 'moments:moments_list' %}" class="btn-card-action mt-auto">去看看海</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 双层波浪背景 -->
+    <div class="wave-container">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position: absolute; bottom: 0; left: 0;">
+            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="shape-fill-2"></path>
+        </svg>
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.11,130.83,119.56,199.56,108.6,245.13,101.38,283.44,77.63,321.39,56.44Z" class="shape-fill-1"></path>
+        </svg>
+    </div>
+</div>
+
+<div style="height: 50px;"></div>
+
+{% endblock %}
