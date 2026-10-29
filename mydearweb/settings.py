@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'mdeditor',
     'works',
     'moments',
+    'adminsortable2',  
 ]
 
 MIDDLEWARE = [

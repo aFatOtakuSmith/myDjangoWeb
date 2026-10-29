@@ -1,23 +1,29 @@
 from django.shortcuts import render, get_object_or_404
-from django.core.paginator import Paginator  # 🌟 必须加上这一行，否则会报 NameError
+from django.core.paginator import Paginator
+from django.db.models import Q
 from .models import Work, WorkCategory
 import markdown
 
 def works_list(request):
-    categories = WorkCategory.objects.all()
-    current_cat_id = request.GET.get('cat', 'all')
-
-    # 🌟 把内部变量名改为了 queryset，防止和函数名 works_list 冲突
-    if current_cat_id == 'all' or not current_cat_id:
-        queryset = Work.objects.all()
-        featured_work = queryset.filter(is_featured=True).first()
-    else:
-        queryset = Work.objects.filter(category_id=current_cat_id)
-        featured_work = queryset.filter(is_featured=True).first()
-
-    # 每页展示 9 个
-    paginator = Paginator(queryset, 9) 
+    # 🌟 分类按 order 排序
+    categories = WorkCategory.objects.all().order_by('order')
     
+    current_cat_id = request.GET.get('cat', 'all')
+    q = request.GET.get('q', '')
+
+    if current_cat_id == 'all' or not current_cat_id:
+        # 🌟 作品按 order 和时间排序
+        queryset = Work.objects.all().order_by('order', '-created_at')
+    else:
+        queryset = Work.objects.filter(category_id=current_cat_id).order_by('order', '-created_at')
+        
+    if q:
+        queryset = queryset.filter(Q(title__icontains=q) | Q(summary__icontains=q))
+        featured_work = None 
+    else:
+        featured_work = queryset.filter(is_featured=True).first()
+
+    paginator = Paginator(queryset, 9) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -26,7 +32,8 @@ def works_list(request):
         'current_cat_id': current_cat_id,
         'featured_work': featured_work,
         'works': page_obj,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'q': q,
     })
 
 def work_detail(request, pk):

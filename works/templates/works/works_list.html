@@ -7,73 +7,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 
 <style>
+
     /* =========================================
-       整体布局
+       页面大标题 (已缩小)
+       ========================================= */
+    .page-title {
+        text-align: center;
+        margin-bottom: 30px; /* 原来是 40px，稍微收紧 */
+    }
+
+    .page-title h1 {
+        font-family: 'Ma Shan Zheng', cursive, sans-serif;
+        font-size: 2.2rem; /* 🌟 改小了，原来是 2.8rem */
+        color: #082f49;
+        letter-spacing: 2px; /* 字间距稍微收紧 */
+        text-shadow: 1px 1px 10px rgba(255, 255, 255, 0.8);
+        margin: 0;
+    }
+
+    /* =========================================
+       整体布局（左：作品列表，右：侧边栏）
        ========================================= */
     .works-layout {
         display: flex;
-        align-items: flex-start;
-        gap: 40px;
-        max-width: 1400px;
-        margin: 30px auto 80px auto;
-        padding: 0 20px;
+        align-items: flex-start; /* 确保左右两侧内容顶端对齐 */
+        gap: 30px;
     }
 
     /* =========================================
-       左侧 220px 目录栏（悬浮）
-       ========================================= */
-    .works-sidebar {
-        flex: 0 0 220px;
-        width: 220px;
-        position: sticky;
-        top: 100px;
-        background: rgba(255, 255, 255, 0.65);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        padding: 24px 16px;
-        box-shadow: 0 15px 35px rgba(14, 165, 233, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.9);
-    }
-
-    .sidebar-title {
-        font-family: 'Ma Shan Zheng', cursive, sans-serif;
-        font-size: 1.6rem;
-        color: #082f49;
-        text-align: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px dashed rgba(14, 165, 233, 0.2);
-        letter-spacing: 2px;
-    }
-
-    .category-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .category-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 18px;
-        border-radius: 12px;
-        color: #475569;
-        text-decoration: none;
-        font-size: 0.95rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px solid transparent;
-    }
-
-    .category-item:hover, .category-item.active {
-        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
-        color: #ffffff;
-        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
-    }
-
-    /* =========================================
-       右侧内容区
+       左侧 80%：作品展示区
        ========================================= */
     .works-main {
         flex: 1;
@@ -85,7 +47,7 @@
         position: relative;
         display: block;
         width: 100%;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
         border-radius: 24px;
         overflow: hidden;
         box-shadow: 0 15px 35px rgba(14, 165, 233, 0.2);
@@ -138,17 +100,6 @@
     }
 
     /* 下方作品网格 */
-    .works-section {
-        width: 100%;
-    }
-    .works-header h2 {
-        font-family: 'Ma Shan Zheng', cursive, sans-serif;
-        font-size: 1.8rem;
-        color: #082f49;
-        margin-bottom: 24px;
-        letter-spacing: 2px;
-    }
-
     .works-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -254,84 +205,178 @@
         margin-top: auto;
     }
 
+    /* 分页样式 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 40px;
+    }
+    .page-link {
+        padding: 8px 18px;
+        border-radius: 50px;
+        background: #fff;
+        color: #0ea5e9;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    .page-link:hover, .page-link.active {
+        background: #0ea5e9;
+        color: #fff;
+        border-color: #0ea5e9;
+    }
+    .page-link.disabled {
+        color: #94a3b8;
+        pointer-events: none;
+        background: #f8fafc;
+    }
+
+    /* =========================================
+       右侧 20%：搜索与分类边栏
+       ========================================= */
+    .works-sidebar {
+        flex: 0 0 240px; 
+        position: sticky;
+        top: 100px;
+    }
+
+    .sidebar-container {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 24px 20px;
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .sidebar-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #082f49;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* 搜索框 */
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: rgba(241, 245, 249, 0.8);
+        border-radius: 50px;
+        padding: 6px 14px;
+        transition: all 0.3s;
+        margin-bottom: 24px;
+    }
+    .search-box:focus-within {
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    }
+    .search-box input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        font-size: 0.85rem;
+        color: #334155;
+    }
+    .search-box button {
+        border: none;
+        background: transparent;
+        color: #0ea5e9;
+        cursor: pointer;
+        padding: 0;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* 分类列表 */
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 16px;
+        border-radius: 10px;
+        color: #475569;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid transparent;
+    }
+    .category-item:hover, .category-item.active {
+        background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+    }
+
     /* 响应式 */
     @media (max-width: 992px) {
         .works-layout {
             flex-direction: column;
         }
+        .works-main {
+            order: 1;
+            width: 100%;
+        }
         .works-sidebar {
+            order: 2;
             position: static;
             width: 100%;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
         .category-list {
             flex-direction: row;
             flex-wrap: wrap;
-            justify-content: center;
         }
         .featured-hero img {
             height: 250px;
         }
+        .page-title h1 {
+            font-size: 2.2rem;
+        }
     }
 </style>
 
-<div class="works-layout">
+<div class="works-page-container">
     
-    <!-- 左侧：分类目录 -->
-    <aside class="works-sidebar">
-        <div class="sidebar-title">作品集</div>
-        <div class="category-list">
-            
-            <!-- 🌟 新增：全部作品选项 -->
-            <a href="?cat=all" class="category-item {% if current_cat_id == 'all' %}active{% endif %}">
-                全部作品
-            </a>
+    <!-- 🌟 页面大标题 -->
+    <div class="page-title">
+        <h1>作品合集</h1>
+    </div>
 
-            <!-- 循环显示各个作品集 -->
-            {% for cat in categories %}
-            <a href="?cat={{ cat.id }}" class="category-item {% if current_cat_id == cat.id|stringformat:'s' %}active{% endif %}">
-                {{ cat.name }}
-            </a>
-            {% empty %}
-            <div class="text-center text-secondary small py-3">暂无其他作品集</div>
-            {% endfor %}
-        </div>
-    </aside>
-
-    <!-- 右侧：作品展示区 -->
-    <main class="works-main">
+    <div class="works-layout">
         
-        <!-- 1. 顶部主打作品 -->
-        {% if featured_work %}
-        <a href="{% url 'works:work_detail' featured_work.pk %}" class="featured-hero">
-            {% if featured_work.cover %}
-            <img src="{{ featured_work.cover.url }}" alt="{{ featured_work.title }}" loading="lazy">
-            {% else %}
-            <div style="width:100%; height:380px; background: linear-gradient(135deg, #0f172a, #0c4a6e);"></div>
-            {% endif %}
+        <!-- 🌟 左侧：作品列表展示区 -->
+        <main class="works-main">
             
-            <div class="featured-overlay">
-                <div class="featured-tag">// FEATURED</div>
-                <h1 class="featured-title">{{ featured_work.title }}</h1>
-                <p class="featured-desc">{{ featured_work.summary }}</p>
-            </div>
-        </a>
-        {% endif %}
+            <!-- 1. 顶部主打作品 -->
+            {% if featured_work %}
+            <a href="{% url 'works:work_detail' featured_work.pk %}" class="featured-hero">
+                {% if featured_work.cover %}
+                <img src="{{ featured_work.cover.url }}" alt="{{ featured_work.title }}" loading="lazy">
+                {% else %}
+                <div style="width:100%; height:380px; background: linear-gradient(135deg, #0f172a, #0c4a6e);"></div>
+                {% endif %}
+                
+                <div class="featured-overlay">
+                    <div class="featured-tag">// FEATURED</div>
+                    <h1 class="featured-title">{{ featured_work.title }}</h1>
+                    <p class="featured-desc">{{ featured_work.summary }}</p>
+                </div>
+            </a>
+            {% endif %}
 
-        <!-- 2. 下方网格作品 -->
-        <div class="works-section">
-            <div class="works-header">
-                <h2>
-                    {% if current_cat_id == 'all' %}
-                        全部作品
-                    {% else %}
-                        {% for cat in categories %}
-                            {% if current_cat_id == cat.id|stringformat:'s' %}{{ cat.name }}{% endif %}
-                        {% endfor %}
-                    {% endif %}
-                </h2>
-            </div>
-
+            <!-- 2. 网格作品 -->
             <div class="works-grid">
                 {% for work in works %}
                 <a href="{% url 'works:work_detail' work.pk %}" class="work-card">
@@ -360,13 +405,63 @@
                     </div>
                 </a>
                 {% empty %}
-                <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 40px;">
-                    该作品集下还没有作品，快去后台添加吧！
+                <div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 60px; background: rgba(255,255,255,0.4); border-radius: 16px;">
+                    没有找到符合条件的作品，换个词试试吧！
                 </div>
                 {% endfor %}
             </div>
-        </div>
 
-    </main>
+            <!-- 3. 分页 -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?cat={{ current_cat_id }}&page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="page-link">上一页</a>
+                {% else %}
+                    <span class="page-link disabled">上一页</span>
+                {% endif %}
+
+                <span class="page-link active">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                    <a href="?cat={{ current_cat_id }}&page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="page-link">下一页</a>
+                {% else %}
+                    <span class="page-link disabled">下一页</span>
+                {% endif %}
+            </nav>
+            {% endif %}
+
+        </main>
+
+        <!-- 🌟 右侧：搜索与作品集合并区块 -->
+        <aside class="works-sidebar">
+            <div class="sidebar-container">
+                
+                <!-- 搜索框 -->
+                <h4 class="sidebar-title">搜索作品</h4>
+                <form method="get" action="{% url 'works:works_list' %}" class="search-box">
+                    <input type="hidden" name="cat" value="{{ current_cat_id }}">
+                    <input type="text" name="q" placeholder="搜索标题或简介..." value="{{ q|default:'' }}">
+                    <button type="submit">🔍</button>
+                </form>
+
+                <!-- 作品集分类 -->
+                <h4 class="sidebar-title">作品集</h4>
+                <div class="category-list">
+                    <a href="?cat=all" class="category-item {% if current_cat_id == 'all' %}active{% endif %}">
+                        全部作品
+                    </a>
+                    {% for cat in categories %}
+                    <a href="?cat={{ cat.id }}" class="category-item {% if current_cat_id == cat.id|stringformat:'s' %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                    {% empty %}
+                    <div class="text-center text-secondary small py-3" style="font-size: 0.8rem;">暂无分类</div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
 </div>
 {% endblock %}

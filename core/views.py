@@ -12,25 +12,29 @@ def contact(request):
     return render(request, 'core/contact.html')
 
 def quotes_list(request):
-    # 获取所有的分类
     categories = QuoteCategory.objects.all()
     
-    current_type_id = request.GET.get('type')
-    # 如果没传参，自动取第一个分类
-    if not current_type_id and categories.exists():
-        current_type_id = str(categories.first().id)
+    # 获取 URL 里的 type 参数 (比如 'sentence_1')
+    current_type_str = request.GET.get('type', '')
+    
+    # 如果没传参数，默认选中第一个分类，并拼上 sentence_ 前缀
+    if not current_type_str and categories.exists():
+        current_type_str = f"sentence_{categories.first().id}"
 
+    # 🌟 核心修复：把 "sentence_" 替换成空，提取出真实的数字 ID
+    real_id = current_type_str.replace('sentence_', '')
+    
     quotes = []
-    if current_type_id:
+    if real_id:
         try:
-            # 获取对应分类下的所有句子
-            category = QuoteCategory.objects.get(id=current_type_id)
+            # 用提取出的纯数字 ID 去查询数据库
+            category = QuoteCategory.objects.get(id=real_id)
             quotes = category.quotes.all()
-        except QuoteCategory.DoesNotExist:
+        except (QuoteCategory.DoesNotExist, ValueError):
             pass
 
     return render(request, 'core/quotes.html', {
         'categories': categories,
         'quotes': quotes,
-        'current_type_id': current_type_id
+        'current_type_id': current_type_str  # 传给前端用于高亮
     })

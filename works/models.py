@@ -7,13 +7,14 @@ from django.utils import timezone
 from django.conf import settings
 from mdeditor.fields import MDTextField
 
-# 🌟 新增：作品集分类模型
 class WorkCategory(models.Model):
     name = models.CharField('作品集名称', max_length=50, unique=True)
+    # 🌟 新增排序字段
+    order = models.PositiveIntegerField(default=0, blank=False, null=False, verbose_name='排序')
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['order'] # 🌟 按 order 排序
         verbose_name = '作品集'
         verbose_name_plural = '作品集'
 
@@ -32,8 +33,10 @@ def get_work_cover_path(instance, filename):
     return os.path.join('works_uploads', year, month, safe_title, new_filename)
 
 class Work(models.Model):
-    # 🌟 新增：关联作品集，允许为空以兼容旧数据
     category = models.ForeignKey(WorkCategory, on_delete=models.CASCADE, verbose_name='所属作品集', related_name='works', null=True, blank=True)
+    
+    # 🌟 新增排序字段
+    order = models.PositiveIntegerField(default=0, blank=False, null=False, verbose_name='排序')
     
     title = models.CharField('作品名称', max_length=100)
     summary = models.CharField('简短简介', max_length=200, help_text='鼠标悬停时显示的一两句话')
@@ -45,7 +48,7 @@ class Work(models.Model):
     is_featured = models.BooleanField('设为主打作品', default=False)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['order', '-created_at'] # 🌟 按 order 排序，未拖拽的新作品按时间倒序
         verbose_name = '作品'
         verbose_name_plural = '作品'
 

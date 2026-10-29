@@ -16,3 +16,7 @@ django.core.exceptions.ImproperlyConfigured: Requested setting MEDIA_ROOT, but s
 文件夹 /home/aFatOtaku/newTravel/mydearweb/media/temps 不存在，无需清理。
 没有发现超过 24 小时的废弃临时图片。
 没有发现超过 24 小时的废弃临时图片。
+已清理废弃临时图片: MyDearest_20261027081320276002.jpg
+已清理废弃临时图片: boqi_20261027090215216262.jpg
+已清理废弃临时图片: MyDearest_20261027090405324322.jpg
+已清理废弃临时图片: boqi_20261027090646417843.jpg
