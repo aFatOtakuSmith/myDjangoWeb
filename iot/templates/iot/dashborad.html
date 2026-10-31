@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">📊 设备实时监控</h2>
+    
+    <div class="row">
+        {% for record in records %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 16px;">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ record.device_id }}</h5>
+                    <h6 class="card-subtitle mb-3 text-muted">{{ record.created_at|date:"Y-m-d H:i:s" }}</h6>
+                    
+                    <ul class="list-group list-group-flush">
+                        <!-- 🌟 遍历下位机发来的 sensor 数组 -->
+                        {% for sensor in record.payload.sensors %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>{{ sensor.name }}</span>
+                            <span class="badge bg-info text-dark rounded-pill">{{ sensor.value }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-muted">暂无设备数据...</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

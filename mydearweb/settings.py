@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-hsx$9@0@g0l7$joj5k%pfj7ax#tc498e!r^3mq@cix++)ht!jg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['106.15.37.66', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -37,15 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # 🌟 新增这一行
     'core',
     'blog',
     'mdeditor',
     'works',
     'moments',
     'adminsortable2',  
+    'iot',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # 🌟 必须在第一行！
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -156,3 +159,18 @@ MDEDITOR_CONFIGS = {
 }
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+CORS_ALLOW_CREDENTIALS = True 
+
+# 🌟 修改 3：不再允许所有网站跨域，只允许你自己的网页/接口跨域
+CORS_ALLOW_ALL_ORIGINS = False
+
+# 允许的跨域来源（Django 自己的 IP，加上 "null" 应对你本地双击打开的 HTML）
+CORS_ALLOWED_ORIGINS = [
+    "http://106.15.37.66:8000",
+    "http://localhost:8000",
+]
+# 允许来自本地文件 (file://) 的请求
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^null$",
+]

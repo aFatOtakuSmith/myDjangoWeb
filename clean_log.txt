@@ -20,3 +20,5 @@ django.core.exceptions.ImproperlyConfigured: Requested setting MEDIA_ROOT, but s
 已清理废弃临时图片: boqi_20261027090215216262.jpg
 已清理废弃临时图片: MyDearest_20261027090405324322.jpg
 已清理废弃临时图片: boqi_20261027090646417843.jpg
+没有发现超过 24 小时的废弃临时图片。
+没有发现超过 24 小时的废弃临时图片。
