@@ -27,6 +27,8 @@ urlpatterns = [
     path('moments/', include('moments.urls')), # 动态相关全走这里
      path('mdeditor/', include('mdeditor.urls')), # 🌟 新增这一行
      path('iot/', include('iot.urls')),  # 🌟 新增
+      path('music/', include('music.urls')), # 🌟 新增
+      path('todo/', include('todo.urls')), # 🌟 新增
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

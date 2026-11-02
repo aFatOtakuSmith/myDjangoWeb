@@ -1,0 +1,163 @@
+{% extends "core/base.html" %}
+{% block title %}新建计划 | 时光规划{% endblock %}
+
+{% block content %}
+<style>
+    body { background-color: #f8fafc; }
+    .add-container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    
+    .add-card {
+        background: #ffffff; border-radius: 24px; padding: 35px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
+    }
+    
+    .page-title { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+    
+    .form-group { margin-bottom: 22px; }
+    .form-label { display: block; font-size: 0.9rem; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+    
+    .form-control {
+        width: 100%; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: 12px;
+        font-size: 1rem; color: #1e293b; outline: none; transition: 0.2s; background: #f8fafc;
+        box-sizing: border-box; font-family: inherit;
+    }
+    .form-control:focus { border-color: #0ea5e9; background: #ffffff; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+    
+    .row-group { display: flex; gap: 15px; }
+    .row-group .form-group { flex: 1; }
+
+    /* 动态面板 */
+    .dynamic-panel { display: none; background: #f0f9ff; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px dashed #bae6fd; }
+    .dynamic-panel.active { display: block; animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .weekday-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .weekday-label {
+        cursor: pointer; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem;
+        background: #ffffff; border: 1px solid #cbd5e1; color: #64748b; transition: 0.2s; user-select: none;
+    }
+    .weekday-label input { display: none; }
+    .weekday-label:has(input:checked) { background: #0ea5e9; color: white; border-color: #0ea5e9; }
+
+    /* 底部按钮 */
+    .action-btns { display: flex; gap: 15px; margin-top: 30px; }
+    .btn-cancel {
+        flex: 1; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0;
+        background: #ffffff; color: #64748b; font-weight: bold; font-size: 1rem; cursor: pointer;
+        text-align: center; text-decoration: none; transition: 0.2s;
+    }
+    .btn-cancel:hover { background: #f1f5f9; }
+    .btn-save {
+        flex: 2; padding: 16px; border-radius: 16px; border: none;
+        background: #0ea5e9; color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); transition: 0.2s;
+    }
+    .btn-save:hover { background: #0284c7; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4); }
+</style>
+
+<div class="add-container">
+    <div class="add-card">
+        <div class="page-title">📝 新建计划</div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">任务内容</label>
+                <input type="text" name="content" class="form-control" placeholder="你想做点什么？" required autocomplete="off" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">详细备注 (可选)</label>
+                <textarea name="description" class="form-control" placeholder="补充一些细节、目标或注意事项..."></textarea>
+            </div>
+
+            <div class="row-group">
+                <div class="form-group">
+                    <label class="form-label">优先级</label>
+                    <select name="priority" class="form-control">
+                        <option value="H">🔥 高优先级</option>
+                        <option value="M" selected>⚡ 中优先级</option>
+                        <option value="L">🌱 低优先级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">生活分类</label>
+                    <select name="category" class="form-control">
+                        <option value="life" selected>🏠 生活</option>
+                        <option value="work">💼 工作</option>
+                        <option value="study">📚 学习</option>
+                        <option value="other">📦 其他</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">执行频率</label>
+                <select name="repeat_type" id="repeat_type_select" class="form-control" onchange="toggleRepeatOptions()">
+                    <option value="none">📌 一次性任务</option>
+                    <option value="daily">🔄 每日习惯</option>
+                    <option value="weekly">📅 每周指定几天</option>
+                    <option value="range">🗓️ 指定日期范围</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="normal_date_group">
+                <label class="form-label">设定日期</label>
+                <input type="date" name="due_date" class="form-control" value="{{ today_str }}">
+            </div>
+
+            <div class="dynamic-panel" id="weekly_options">
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: bold; margin-bottom: 10px;">选择需要打卡的星期：</div>
+                <div class="weekday-group">
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="1"> 周一</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="2"> 周二</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="3"> 周三</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="4"> 周四</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="5"> 周五</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="6"> 周六</label>
+                    <label class="weekday-label"><input type="checkbox" name="weekday" value="7"> 周日</label>
+                </div>
+            </div>
+
+            <div class="dynamic-panel" id="range_options">
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: bold; margin-bottom: 10px;">设定开始和结束时间：</div>
+                <div class="row-group">
+                    <input type="date" name="start_date" class="form-control">
+                    <input type="date" name="end_date" class="form-control">
+                </div>
+            </div>
+
+            <div class="action-btns">
+                <a href="{% url 'todo:todo_list' %}" class="btn-cancel">取消</a>
+                <button type="submit" class="btn-save">保存计划</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleRepeatOptions() {
+        const type = document.getElementById('repeat_type_select').value;
+        document.getElementById('weekly_options').classList.remove('active');
+        document.getElementById('range_options').classList.remove('active');
+        document.getElementById('normal_date_group').style.display = (type === 'none') ? 'block' : 'none';
+
+        if (type === 'weekly') document.getElementById('weekly_options').classList.add('active');
+        if (type === 'range') document.getElementById('range_options').classList.add('active');
+    }
+    toggleOptions();
+</script>
+<script>
+    // 🌟 防后退核心代码：拦截浏览器缓存恢复
+    window.addEventListener('pageshow', function (event) {
+        // event.persisted 为 true 表示页面是从浏览器的往返缓存（BFCache）中恢复的
+        // 或者检测到用户的导航方式为“后退”（type === 2）
+        if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+            // 强制跳转回列表页
+            window.location.href = "{% url 'todo:todo_list' %}";
+        }
+    });
+</script>
+{% endblock %}

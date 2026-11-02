@@ -1,0 +1,228 @@
+{% extends "core/base.html" %}
+{% block title %}时光规划 | 习惯与待办{% endblock %}
+
+{% block content %}
+<style>
+    :root { --primary: #0ea5e9; --bg-color: #f8fafc; --text-main: #1e293b; --text-sub: #64748b; }
+    body { background-color: var(--bg-color); }
+    .todo-container { max-width: 760px; margin: 40px auto; padding: 0 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+    .page-title { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0; }
+    .btn-add-new { display: flex; align-items: center; gap: 6px; background: var(--primary); color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); transition: 0.2s; }
+    .btn-add-new:hover { background: #0284c7; transform: translateY(-2px); color: white; }
+    .group-section { margin-bottom: 30px; }
+    .group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; padding-left: 5px; color: var(--text-sub); font-size: 0.95rem; font-weight: 800; }
+    .group-header .count { font-size: 0.8rem; background: #e2e8f0; padding: 2px 8px; border-radius: 10px; color: #475569; }
+    .group-header.overdue { color: #ef4444; }
+    .group-header.habit { color: #8b5cf6; }
+    .todo-item { background: #ffffff; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; transition: all 0.25s ease; position: relative; overflow: hidden; }
+    .todo-item:hover { transform: translateX(4px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.08); border-color: #bae6fd; }
+    .todo-item.priority-H::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#ef4444; }
+    .todo-item.priority-M::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#f59e0b; }
+    .todo-item.priority-L::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#10b981; }
+    .todo-item.habit-item { background: linear-gradient(to right, #fdf4ff, #ffffff); border-color: #f3e8ff; }
+    .todo-left { display: flex; align-items: flex-start; gap: 16px; flex: 1; }
+    .checkbox-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #cbd5e1; background: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: white; transition: all 0.2s; flex-shrink: 0; margin-top: 2px; }
+    .checkbox-btn:hover { border-color: var(--primary); background: #f0f9ff; }
+    .checkbox-btn.checked { background: var(--primary); border-color: var(--primary); }
+    .habit-item .checkbox-btn:hover { border-color: #8b5cf6; background: #fdf4ff; }
+    .habit-item .checkbox-btn.checked { background: #8b5cf6; border-color: #8b5cf6; }
+    .todo-info { flex: 1; }
+    .todo-content { font-size: 1.05rem; color: var(--text-main); font-weight: 500; line-height: 1.4; margin-bottom: 6px; word-break: break-all; transition: color 0.2s; }
+    .todo-content:hover { color: var(--primary); }
+    .todo-content.done { text-decoration: line-through; color: #94a3b8; font-weight: normal; }
+    .todo-desc { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; background: #f8fafc; padding: 6px 10px; border-radius: 6px; display: inline-block; }
+    .todo-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+    .badge-priority-H { background: #fee2e2; color: #ef4444; }
+    .badge-priority-M { background: #fef3c7; color: #d97706; }
+    .badge-priority-L { background: #dcfce7; color: #059669; }
+    .badge-category { background: #e0f2fe; color: #0284c7; }
+    .badge-date { color: #94a3b8; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; font-family: monospace; }
+    .badge-repeat { background: #f3e8ff; color: #9333ea; }
+    .btn-delete { background: none; border: none; color: #cbd5e1; font-size: 1.2rem; padding: 8px; cursor: pointer; opacity: 0; transform: scale(0.8); transition: all 0.2s; border-radius: 8px; }
+    .todo-item:hover .btn-delete { opacity: 1; transform: scale(1); }
+    .btn-delete:hover { color: #ef4444; background: #fee2e2; }
+    .completed-section { margin-top: 40px; opacity: 0.7; transition: 0.3s; }
+    .completed-section:hover { opacity: 1; }
+    .empty-state { text-align: center; padding: 30px 20px; color: #94a3b8; background: #ffffff; border-radius: 16px; border: 1px dashed #e2e8f0; }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+    @media (max-width: 600px) { .page-header { flex-direction: column; align-items: flex-start; gap: 15px; } }
+</style>
+
+<div class="todo-container">
+    <div class="page-header">
+        <h1 class="page-title">时光规划</h1>
+        <a href="{% url 'todo:todo_add' %}" class="btn-add-new"><span style="font-size: 1.2rem;">+</span> 新建计划</a>
+    </div>
+
+    <!-- 今日习惯区 -->
+    {% if today_recurring %}
+    <div class="group-section">
+        <div class="group-header habit">🔄 今日习惯 <span class="count">{{ today_recurring|length }}</span></div>
+        {% for todo in today_recurring %}
+        <div class="todo-item habit-item priority-{{ todo.priority|default:'M' }}">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ todo.id }}">
+                    <button type="submit" name="toggle_todo" class="checkbox-btn {% if todo.is_checked_today %}checked{% endif %}">{% if todo.is_checked_today %}✓{% endif %}</button>
+                </form>
+                <div class="todo-info">
+                    <a href="{% url 'todo:todo_edit' todo.id %}" style="text-decoration: none; display: block;">
+                        <div class="todo-content {% if todo.is_checked_today %}done{% endif %}">{{ todo.content }}</div>
+                    </a>
+                    <div class="todo-meta">
+                        <span class="badge badge-repeat">习惯打卡</span>
+                        <span class="badge badge-priority-{{ todo.priority|default:'M' }}">{{ todo.get_priority_display|default:"中" }}</span>
+                        <span class="badge badge-category">{{ todo.get_category_display|default:"生活" }}</span>
+                        <span class="badge" style="background: #dcfce7; color: #16a34a;">🏅 已完成 {{ todo.completed_count }} 次</span>
+                        {% if todo.missed_count > 0 %}<span class="badge" style="background: #fef2f2; color: #ef4444;">❌ 漏签 {{ todo.missed_count }} 次</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 逾期区 -->
+    {% if overdue %}
+    <div class="group-section">
+        <div class="group-header overdue">🔥 已逾期 <span class="count">{{ overdue|length }}</span></div>
+        {% for todo in overdue %}
+        <div class="todo-item priority-{{ todo.priority|default:'M' }}">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="toggle_todo" class="checkbox-btn"></button></form>
+                <div class="todo-info">
+                    <a href="{% url 'todo:todo_edit' todo.id %}" style="text-decoration: none; display: block;">
+                        <div class="todo-content">{{ todo.content }}</div>
+                    </a>
+                    {% if todo.description %}<div class="todo-desc">{{ todo.description }}</div>{% endif %}
+                    <div class="todo-meta">
+                        <span class="badge badge-priority-{{ todo.priority|default:'M' }}">{{ todo.get_priority_display|default:"中" }}</span>
+                        <span class="badge badge-category">{{ todo.get_category_display|default:"生活" }}</span>
+                        <span class="badge-date">📅 逾期于 {{ todo.due_date|date:"m月d日" }}</span>
+                        <span class="badge" style="background: #fef2f2; color: #ef4444;">❌ 未完成</span>
+                    </div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 今日待办区 -->
+    <div class="group-section">
+        <div class="group-header">☀️ 今日待办 <span class="count">{{ today_list|length }}</span></div>
+        {% for todo in today_list %}
+        <div class="todo-item priority-{{ todo.priority|default:'M' }}">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="toggle_todo" class="checkbox-btn"></button></form>
+                <div class="todo-info">
+                    <a href="{% url 'todo:todo_edit' todo.id %}" style="text-decoration: none; display: block;">
+                        <div class="todo-content">{{ todo.content }}</div>
+                    </a>
+                    {% if todo.description %}<div class="todo-desc">{{ todo.description }}</div>{% endif %}
+                    <div class="todo-meta">
+                        <span class="badge badge-priority-{{ todo.priority|default:'M' }}">{{ todo.get_priority_display|default:"中" }}</span>
+                        <span class="badge badge-category">{{ todo.get_category_display|default:"生活" }}</span>
+                    </div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% empty %}
+            {% if not today_recurring and not overdue %}<div class="empty-state"><div class="icon">🍃</div><div>今天没有待办事项，享受生活吧！</div></div>{% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- 明天区 -->
+    {% if tomorrow_list %}
+    <div class="group-section">
+        <div class="group-header">🌤️ 明天计划 <span class="count">{{ tomorrow_list|length }}</span></div>
+        {% for todo in tomorrow_list %}
+        <div class="todo-item priority-{{ todo.priority|default:'M' }}">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="toggle_todo" class="checkbox-btn"></button></form>
+                <div class="todo-info">
+                    <a href="{% url 'todo:todo_edit' todo.id %}" style="text-decoration: none; display: block;">
+                        <div class="todo-content">{{ todo.content }}</div>
+                    </a>
+                    <div class="todo-meta">
+                        <span class="badge badge-priority-{{ todo.priority|default:'M' }}">{{ todo.get_priority_display|default:"中" }}</span>
+                        <span class="badge badge-category">{{ todo.get_category_display|default:"生活" }}</span>
+                    </div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 未来区 -->
+    {% if future_list %}
+    <div class="group-section">
+        <div class="group-header">📅 未来计划 <span class="count">{{ future_list|length }}</span></div>
+        {% for todo in future_list %}
+        <div class="todo-item priority-{{ todo.priority|default:'M' }}">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="toggle_todo" class="checkbox-btn"></button></form>
+                <div class="todo-info">
+                    <a href="{% url 'todo:todo_edit' todo.id %}" style="text-decoration: none; display: block;">
+                        <div class="todo-content">{{ todo.content }}</div>
+                    </a>
+                    {% if todo.description %}<div class="todo-desc">{{ todo.description }}</div>{% endif %}
+                    <div class="todo-meta">
+                        <span class="badge badge-priority-{{ todo.priority|default:'M' }}">{{ todo.get_priority_display|default:"中" }}</span>
+                        <span class="badge badge-category">{{ todo.get_category_display|default:"生活" }}</span>
+                        <span class="badge-date">🗓️ {{ todo.due_date|date:"m月d日" }}</span>
+                    </div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 已完成区 -->
+    {% if done_todos %}
+    <div class="completed-section">
+        <div class="group-header">✅ 最近完成 <span class="count">{{ done_todos|length }}</span></div>
+        {% for todo in done_todos %}
+        <div class="todo-item" style="opacity: 0.8;">
+            <div class="todo-left">
+                <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="toggle_todo" class="checkbox-btn checked">✓</button></form>
+                <div class="todo-info">
+                    <div class="todo-content done">{{ todo.content }}</div>
+                    <div class="todo-meta"><span class="badge-date">✔️ 完成于 {{ todo.completed_at|date:"m月d日 H:i" }}</span></div>
+                </div>
+            </div>
+            <form method="post" style="margin:0;">{% csrf_token %}<input type="hidden" name="item_id" value="{{ todo.id }}"><button type="submit" name="delete_todo" class="btn-delete">🗑️</button></form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
+        <a href="{% url 'core:profile' %}" style="display: inline-block; padding: 10px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; color: var(--text-sub); text-decoration: none; font-weight: 500; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);" onmouseover="this.style.color='var(--primary)'; this.style.borderColor='var(--primary)'" onmouseout="this.style.color='var(--text-sub)'; this.style.borderColor='#e2e8f0'">
+            ← 返回个人主页
+        </a>
+    </div>
+</div>
+<script>
+    // 🌟 防后退核心代码：拦截浏览器缓存恢复
+    window.addEventListener('pageshow', function (event) {
+        // event.persisted 为 true 表示页面是从浏览器的往返缓存（BFCache）中恢复的
+        // 或者检测到用户的导航方式为“后退”（type === 2）
+        if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+            // 强制跳转回列表页
+            window.location.href = "{% url 'todo:todo_list' %}";
+        }
+    });
+</script>
+{% endblock %}

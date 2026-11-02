@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+{% block title %}个人中心 | {{ user.username }}{% endblock %}
+
+{% block content %}
+<style>
+    .portal-card {
+        background: white; border-radius: 20px; padding: 30px; border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); text-decoration: none; color: inherit;
+        display: flex; flex-direction: column; align-items: center; text-align: center;
+        transition: all 0.3s ease; height: 100%; box-sizing: border-box;
+    }
+    .portal-card:hover {
+        transform: translateY(-5px); box-shadow: 0 15px 30px rgba(14, 165, 233, 0.1); border-color: #bae6fd;
+    }
+    .portal-icon {
+        font-size: 3rem; margin-bottom: 15px; width: 80px; height: 80px;
+        display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease;
+    }
+    .portal-card:hover .portal-icon { transform: scale(1.1) rotate(5deg); }
+</style>
+
+<div style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
+    <!-- 顶部欢迎栏 -->
+    <div style="background: white; border-radius: 20px; padding: 30px 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <h1 style="color: #0c4a6e; margin: 0 0 8px 0; font-size: 1.8rem;">👋 欢迎回来, 莫晓!</h1>
+            <p style="color: #64748b; margin: 0;">这里是你的专属控制台，请选择你要进入的功能模块。</p>
+        </div>
+        <a href="{% url 'core:logout' %}" style="padding: 10px 20px; background: #fee2e2; color: #ef4444; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s;">退出登录</a>
+    </div>
+
+    <!-- 应用卡片导航区 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+        <!-- 音乐播放器 -->
+        <a href="/music/" class="portal-card">
+            <div class="portal-icon" style="background: #e0f2fe; color: #0ea5e9;">🎵</div>
+            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">时光留声机</h2>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">进入专属音乐空间，查看歌词、管理歌单和收藏喜欢的歌曲。</p>
+        </a>
+        <!-- 计划表卡片 -->
+        <a href="/todo/" class="portal-card">
+            <div class="portal-icon" style="background: #fef3c7; color: #d97706;">📝</div>
+            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">今日待办</h2>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">记录今天需要完成的任务，支持新建、标记完成和删除。</p>
+        </a>
+
+
+        <!-- 后台管理 -->
+        <a href="/admin/" class="portal-card">
+            <div class="portal-icon" style="background: #fce7f3; color: #db2777;">⚙️</div>
+            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">后台管理系统</h2>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">管理网站数据，包括歌曲排序、批量上传、设备数据清理等。</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

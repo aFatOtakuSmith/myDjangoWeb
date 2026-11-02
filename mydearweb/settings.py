@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'moments',
     'adminsortable2',  
     'iot',
+    'music', 
+    'todo',  # 🌟 核心：加上这一行！
 ]
 
 MIDDLEWARE = [
@@ -113,11 +115,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
+
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -174,3 +177,5 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^null$",
 ]
+
+LOGIN_URL = '/login/'

@@ -1,0 +1,108 @@
+{% extends "core/base.html" %}
+{% block title %}欢迎回来 | 时光留声机{% endblock %}
+
+{% block content %}
+<style>
+    /* 海洋风背景动效 */
+    .ocean-bg {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 40%, #38bdf8 100%);
+        z-index: -2;
+    }
+    .ocean-glow {
+        position: absolute; top: 20%; left: 30%; width: 400px; height: 400px;
+        background: rgba(255,255,255,0.6); border-radius: 50%;
+        filter: blur(80px); z-index: -1; animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-20px) scale(1.05); }
+        100% { transform: translateY(0px) scale(1); }
+    }
+
+    /* 玻璃拟态卡片 */
+    .glass-login-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 20px 40px rgba(14, 165, 233, 0.15), inset 0 0 0 1px rgba(255,255,255,0.5);
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        animation: fadeUp 0.6s ease-out;
+    }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-input {
+        background: rgba(255,255,255,0.5);
+        border: 1px solid rgba(186, 230, 253, 0.8);
+        border-radius: 12px;
+        padding: 14px 16px;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 0.95rem;
+        color: #0c4a6e;
+        transition: all 0.3s;
+    }
+    .glass-input:focus {
+        background: #ffffff;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        outline: none;
+    }
+    .glass-btn {
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        transition: all 0.3s;
+    }
+    .glass-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(14, 165, 233, 0.4);
+        filter: brightness(1.05);
+    }
+</style>
+
+<div class="ocean-bg">
+    <div class="ocean-glow"></div>
+</div>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="glass-login-card">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🌊</div>
+            <h2 style="color: #0c4a6e; font-weight: 800; letter-spacing: 1px; margin: 0;">Welcome Back</h2>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 8px;">登录以继续你的海洋之旅</p>
+        </div>
+        
+        {% if error %}
+            <div style="color: #ef4444; text-align: center; margin-bottom: 15px; font-size: 0.85rem; background: #fef2f2; padding: 10px; border-radius: 10px; border: 1px solid #fecaca;">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #334155; font-size: 0.85rem; font-weight: 600;">用户名</label>
+                <input type="text" name="username" class="glass-input" required placeholder="请输入用户名">
+            </div>
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 8px; color: #334155; font-size: 0.85rem; font-weight: 600;">密码</label>
+                <input type="password" name="password" class="glass-input" required placeholder="请输入密码">
+            </div>
+            <button type="submit" class="glass-btn">登 录</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

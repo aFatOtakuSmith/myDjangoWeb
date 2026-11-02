@@ -17,14 +17,32 @@
     <!-- 顶部导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-ocean sticky-top">
         <div class="container">
+            <!-- 左侧：品牌标题 -->
             <a class="navbar-brand fs-4" href="{% url 'core:index' %}">🌊 Where Time Meets the Sea</a>
             
+            <!-- 手机端折叠菜单按钮 -->
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
+            <!-- 右侧导航链接 -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto gap-2">
+                <ul class="navbar-nav ms-auto gap-2 align-items-center">
+                    <!-- 🌟 个人主页 / 登录 入口（替换了原来的音乐图标） -->
+                    <li class="nav-item me-2">
+                        {% if user.is_authenticated %}
+                            <!-- 已登录：显示个人主页图标 -->
+                            <a class="nav-link fs-5 p-0" href="{% url 'core:profile' %}" title="个人主页" style="opacity: 0.8; transition: all 0.3s; display: inline-block;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                👤
+                            </a>
+                        {% else %}
+                            <!-- 未登录：显示登录图标 -->
+                            <a class="nav-link fs-5 p-0" href="{% url 'core:login' %}" title="登录" style="opacity: 0.8; transition: all 0.3s; display: inline-block;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'" onmouseout="this.style.opacity='0.8'; this.style.transform='scale(1)'">
+                                🔐
+                            </a>
+                        {% endif %}
+                    </li>
+                    
                     <li class="nav-item"><a class="nav-link" href="{% url 'core:index' %}">首页</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'works:works_list' %}">作品</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:blog_list' %}">博客</a></li>

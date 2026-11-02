@@ -103,3 +103,4 @@ build/
 # 在 "3. Django 运行时数据" 分组下，紧跟 db.sqlite3 那一行
 *.sqlite3
 *.sqlite3-journal
+*.mp3

@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+{% block title %}功能开发中{% endblock %}
+
+{% block content %}
+<div style="min-height: 70vh; display: flex; align-items: center; justify-content: center; background: #f8fafc; padding: 20px;">
+    <div style="text-align: center; background: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; max-width: 500px; width: 100%;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🚧</div>
+        <h2 style="color: #0c4a6e; margin-bottom: 15px;">功能正在开发中</h2>
+        <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px;">
+            抱歉，该页面目前仅对站长开放。<br>
+            更多神奇的功能正在加急赶工中，敬请期待！
+        </p>
+        <a href="{% url 'core:index' %}" style="display: inline-block; padding: 10px 24px; background: #0ea5e9; color: white; border-radius: 10px; text-decoration: none; font-weight: bold;">
+            返回首页
+        </a>
+    </div>
+</div>
+{% endblock %}
