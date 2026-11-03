@@ -1,0 +1,260 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ chapter.title }} - {{ novel.title }}{% endblock %}
+
+{% block content %}
+<!-- 引入中文字体 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+    /* 全局阅读主题变量 */
+    :root {
+        --read-bg: #f9f9f9;
+        --read-text: #333333;
+        --read-panel-bg: rgba(255, 255, 255, 0.95);
+        --read-border: #e2e8f0;
+        --font-size: 20px;
+        --line-height: 2.0;
+    }
+
+    /* 夜间模式 */
+    body.dark-mode {
+        --read-bg: #1a1a1a;
+        --read-text: #d1d1d1;
+        --read-panel-bg: rgba(40, 40, 40, 0.95);
+        --read-border: #333333;
+    }
+
+    /* 护眼模式 */
+    body.sepia-mode {
+        --read-bg: #f4ecd8;
+        --read-text: #5b4636;
+        --read-panel-bg: rgba(244, 236, 216, 0.95);
+        --read-border: #e0d4c0;
+    }
+
+    /* 覆盖 base.html 的背景，强制全屏阅读 */
+    main.container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0;
+        background-color: var(--read-bg);
+        transition: background-color 0.3s;
+    }
+
+    .read-container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 60px 20px 120px;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* 顶部信息与返回 */
+    .read-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    .read-header h1 {
+        font-family: 'Noto Serif SC', serif;
+        font-size: calc(var(--font-size) * 1.5);
+        color: var(--read-text);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    .read-header .meta {
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+    .read-header .meta a {
+        color: #0ea5e9;
+        text-decoration: none;
+    }
+
+    /* 正文排版 */
+    .read-content {
+        font-family: 'Noto Serif SC', serif;
+        font-size: var(--font-size);
+        color: var(--read-text);
+        line-height: var(--line-height);
+        text-align: justify;
+        transition: font-size 0.2s, color 0.3s;
+    }
+    .read-content p {
+        text-indent: 2em; /* 首行缩进两字符 */
+        margin-bottom: 1em;
+    }
+
+    /* 底部悬浮操作栏 */
+    .read-toolbar {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--read-panel-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--read-border);
+        border-radius: 50px;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        z-index: 1000;
+        transition: background 0.3s, border 0.3s;
+    }
+
+    .btn-tool {
+        background: none;
+        border: none;
+        color: var(--read-text);
+        cursor: pointer;
+        font-size: 0.95rem;
+        padding: 8px 15px;
+        border-radius: 20px;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+    .btn-tool:hover { background: rgba(0,0,0,0.05); }
+    body.dark-mode .btn-tool:hover { background: rgba(255,255,255,0.1); }
+    .btn-tool.disabled { opacity: 0.3; pointer-events: none; }
+
+    .divider { width: 1px; height: 20px; background: var(--read-border); }
+
+    /* 设置面板 */
+    .settings-panel {
+        position: fixed;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--read-panel-bg);
+        border: 1px solid var(--read-border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: none;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 1000;
+        width: 280px;
+    }
+    .settings-panel.show { display: flex; }
+    
+    .setting-row { display: flex; justify-content: space-between; align-items: center; color: var(--read-text); font-size: 0.9rem; }
+    .color-options { display: flex; gap: 10px; }
+    .color-btn {
+        width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+        border: 2px solid transparent; transition: 0.2s;
+    }
+    .color-btn.active { border-color: #0ea5e9; transform: scale(1.1); }
+    .bg-white { background: #f9f9f9; border-color: #ddd; }
+    .bg-sepia { background: #f4ecd8; border-color: #ddd; }
+    .bg-dark { background: #1a1a1a; border-color: #444; }
+</style>
+
+<div class="read-container">
+    <div class="read-header">
+        <h1>{{ chapter.title }}</h1>
+        <div class="meta">
+            出自：<a href="{% url 'novel:novel_detail' novel.pk %}">{{ novel.title }}</a> · 字数：{{ chapter.word_count }}
+        </div>
+    </div>
+
+    <div class="read-content" id="read-content">
+        <!-- 使用 Django 模板的 linebreaks 过滤器，自动将换行变成 <p> 标签 -->
+        {{ chapter.content|linebreaks }}
+    </div>
+</div>
+
+<!-- 底部控制栏 -->
+<div class="read-toolbar">
+    {% if prev_chapter %}
+        <a href="{% url 'novel:chapter_read' prev_chapter.pk %}" class="btn-tool">上一章</a>
+    {% else %}
+        <span class="btn-tool disabled">上一章</span>
+    {% endif %}
+
+    <div class="divider"></div>
+    <a href="{% url 'novel:novel_detail' novel.pk %}" class="btn-tool">目录</a>
+    <div class="divider"></div>
+
+    <button class="btn-tool" onclick="toggleSettings()">Aa</button>
+    <div class="divider"></div>
+
+    {% if next_chapter %}
+        <a href="{% url 'novel:chapter_read' next_chapter.pk %}" class="btn-tool">下一章</a>
+    {% else %}
+        <span class="btn-tool disabled">下一章</span>
+    {% endif %}
+</div>
+
+<!-- 设置悬浮面板 -->
+<div class="settings-panel" id="settings-panel">
+    <div class="setting-row">
+        <span>字号</span>
+        <div>
+            <button class="btn-tool" onclick="changeFontSize(-2)" style="padding: 2px 10px; font-size: 0.8rem;">A-</button>
+            <button class="btn-tool" onclick="changeFontSize(2)" style="padding: 2px 10px; font-size: 1.2rem;">A+</button>
+        </div>
+    </div>
+    <div class="setting-row">
+        <span>背景</span>
+        <div class="color-options">
+            <div class="color-btn bg-white" onclick="changeTheme('light')"></div>
+            <div class="color-btn bg-sepia" onclick="changeTheme('sepia')"></div>
+            <div class="color-btn bg-dark" onclick="changeTheme('dark')"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== 设置面板切换 ==========
+    function toggleSettings() {
+        const panel = document.getElementById('settings-panel');
+        panel.classList.toggle('show');
+    }
+
+    // ========== 字号调节 ==========
+    let currentFontSize = parseInt(localStorage.getItem('read_fontSize')) || 20;
+    
+    function changeFontSize(delta) {
+        currentFontSize += delta;
+        if (currentFontSize < 14) currentFontSize = 14;
+        if (currentFontSize > 32) currentFontSize = 32;
+        document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
+        localStorage.setItem('read_fontSize', currentFontSize);
+    }
+
+    // ========== 主题调节 ==========
+    function changeTheme(theme) {
+        document.body.classList.remove('dark-mode', 'sepia-mode');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else if (theme === 'sepia') {
+            document.body.classList.add('sepia-mode');
+        }
+        localStorage.setItem('read_theme', theme);
+    }
+
+    // 页面加载时应用保存的设置
+    document.addEventListener("DOMContentLoaded", function() {
+        // 恢复字号
+        document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
+        
+        // 恢复背景
+        const savedTheme = localStorage.getItem('read_theme');
+        if (savedTheme) {
+            changeTheme(savedTheme);
+        }
+
+        // 点击页面其他地方关闭面板
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('settings-panel');
+            const isClickInside = panel.contains(event.target) || event.target.closest('.read-toolbar');
+            if (!isClickInside && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            }
+        });
+    });
+</script>
+{% endblock %}

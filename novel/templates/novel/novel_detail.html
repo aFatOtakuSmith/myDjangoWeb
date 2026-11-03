@@ -1,0 +1,62 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ novel.title }} | 小说详情{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+    
+    <!-- 顶部小说信息区 -->
+    <div style="display: flex; gap: 30px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom: 30px; flex-wrap: wrap;">
+        
+        <!-- 左侧封面 -->
+        <div style="flex: 0 0 200px;">
+            {% if novel.cover %}
+                <img src="{{ novel.cover.url }}" alt="{{ novel.title }}" style="width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+            {% else %}
+                <div style="width: 100%; aspect-ratio: 3/4; border-radius: 12px; background: linear-gradient(135deg, #bae6fd, #38bdf8); display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">📖</div>
+            {% endif %}
+        </div>
+
+        <!-- 右侧信息 -->
+        <div style="flex: 1; min-width: 300px;">
+            <h1 style="margin: 0 0 10px 0; color: #0c4a6e; font-size: 2rem; font-weight: 800;">{{ novel.title }}</h1>
+            <div style="display: flex; gap: 15px; color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">
+                <span>作者：{{ novel.author.username }}</span>
+                <span>状态：{{ novel.get_status_display }}</span>
+                <span>总字数：{{ novel.total_words }} 字</span>
+            </div>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 10px; color: #475569; line-height: 1.8; font-size: 0.95rem; margin-bottom: 20px;">
+                {{ novel.summary|default:"作者很懒，还没有写简介..." }}
+            </div>
+
+            <!-- 快速开始阅读按钮 -->
+            {% if chapters %}
+                {% with first_chapter=chapters.first %}
+                <a href="{% url 'novel:chapter_read' first_chapter.pk %}" style="display: inline-block; background: #0ea5e9; color: white; padding: 10px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s;" onmouseover="this.style.background='#0284c7'" onmouseout="this.style.background='#0ea5e9'">
+                    开始阅读 →
+                </a>
+                {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 章节目录区 -->
+    <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
+        <h2 style="margin-top: 0; color: #0c4a6e; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;">章节目录</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+            {% for chapter in chapters %}
+                <!-- 注意：这里的 chapter_read 路由我们下一步做，暂时写个空链接 -->
+                <a href="{% url 'novel:chapter_read' chapter.pk %}" style="display: block; padding: 12px 15px; background: #f8fafc; border-radius: 8px; text-decoration: none; color: #334155; font-size: 0.95rem; border: 1px solid transparent; transition: 0.2s;" onmouseover="this.style.background='#e0f2fe'; this.style.borderColor='#bae6fd'; this.style.color='#0ea5e9'" onmouseout="this.style.background='#f8fafc'; this.style.borderColor='transparent'; this.style.color='#334155'">
+                    {{ chapter.title }}
+                </a>
+            {% empty %}
+                <div style="color: #94a3b8; font-size: 0.9rem;">暂无章节</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -16,9 +16,8 @@
         --accent-blue: #0ea5e9;
         --deep-blue: #082f49;
         --glass-bg: rgba(255, 255, 255, 0.7);
-        --glass-border: rgba(14, 165, 233, 0.15); /* 边框带上淡蓝色 */
+        --glass-border: rgba(14, 165, 233, 0.15);
         
-        /* 🌟 保持纯白背景，但在角落加入极淡的海洋蓝光晕 */
         background-color: #ffffff;
         background-image: 
             radial-gradient(circle at 10% 10%, rgba(224, 242, 254, 0.6) 0%, transparent 40%),
@@ -113,7 +112,6 @@
         box-shadow: 0 12px 35px rgba(14, 165, 233, 0.06);
         transition: all 0.4s ease;
     }
-    /* 顶部蓝色亮条 */
     .about-profile-card::before {
         content: '';
         position: absolute;
@@ -153,7 +151,6 @@
         font-family: 'Fira Code', monospace;
     }
 
-    /* 状态徽章 */
     .about-status-badge {
         display: inline-flex;
         align-items: center;
@@ -182,7 +179,6 @@
         50% { opacity: 0.4; transform: scale(0.8); }
     }
 
-    /* 联系方式块 */
     .about-contact-blocks {
         display: flex;
         flex-direction: column;
@@ -224,7 +220,6 @@
         white-space: nowrap;
     }
     
-    /* 复制成功状态 */
     .contact-block.copied {
         background: #f0fdf4;
         border-color: #10b981;
@@ -237,7 +232,6 @@
         font-weight: 600;
     }
 
-    /* 下载按钮 */
     .about-btn {
         display: inline-flex;
         justify-content: center;
@@ -262,7 +256,6 @@
         box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
     }
 
-    /* 技能标签 */
     .about-skill-tags {
         background: var(--glass-bg);
         backdrop-filter: blur(20px);
@@ -321,7 +314,6 @@
         100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* 标题样式 */
     .about-section h2 {
         font-size: 1.3rem;
         color: var(--deep-blue);
@@ -341,7 +333,6 @@
         box-shadow: 0 0 10px var(--accent-blue);
     }
 
-    /* 介绍段落 */
     .about-section p {
         color: var(--text-muted);
         line-height: 2;
@@ -356,61 +347,11 @@
         border-radius: 4px;
     }
 
-    /* 意向网格 */
-    .about-intent-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-    }
-    .about-intent-item {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 20px;
-        transition: all 0.4s ease;
-        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.03);
-        position: relative;
-        overflow: hidden;
-    }
-    .about-intent-item::after {
-        content: '';
-        position: absolute;
-        left: 0; top: 0; height: 100%; width: 4px;
-        background: var(--accent-blue);
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-    .about-intent-item:hover {
-        background: #ffffff;
-        border-color: rgba(14, 165, 233, 0.3);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 25px rgba(14, 165, 233, 0.1);
-    }
-    .about-intent-item:hover::after {
-        opacity: 1;
-    }
-    .about-intent-label {
-        display: block;
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-bottom: 10px;
-        font-family: 'Fira Code', monospace;
-    }
-    .about-intent-value {
-        display: block;
-        font-size: 1rem;
-        color: var(--deep-blue);
-        font-weight: 700;
-    }
-
-    /* 经历时间线 */
+    /* 项目经历时间线 */
     .about-experience-item {
         position: relative;
         padding-left: 28px;
         margin-bottom: 40px;
-    }
-    .about-experience-item:last-child {
-        margin-bottom: 0;
     }
     .about-experience-item::after {
         content: '';
@@ -534,6 +475,7 @@
         box-shadow: 0 4px 15px rgba(14, 165, 233, 0.03);
         position: relative;
         overflow: hidden;
+        display: block;
     }
     .about-work-card::before {
         content: '';
@@ -604,10 +546,9 @@
   <!-- 锚点导航 -->
   <nav class="about-anchor-nav" aria-label="页面内导航">
     <a href="#about-intro">介绍</a>
-    <a href="#about-intent">意向</a>
-    <a href="#about-experience">经历</a>
+    <a href="#about-experience">项目经历</a>
     <a href="#about-skills">技能</a>
-    <a href="#about-works">作品</a>
+    <a href="#about-works">开源作品</a>
   </nav>
 
   <div class="about-layout">
@@ -616,38 +557,35 @@
     <aside class="about-sidebar">
       <div class="about-profile-card">
         <img class="about-avatar" src="{% static 'core/images/author-avatar.jpg' %}" alt="个人头像">
-        <h1 class="about-name">aFatOtaku</h1>
-        <p class="about-tagline">Embedded & Web Developer</p>
-        <span class="about-status-badge">READY_TO_WORK</span>
+        <h1 class="about-name">莫晓</h1>
+        <p class="about-tagline">嵌入式与全栈开发者</p>
+        <span class="about-status-badge">持续编码中</span>
 
         <!-- 联系方式块 -->
         <div class="about-contact-blocks">
-          <!-- 邮箱块（带复制功能） -->
+          <!-- 邮箱块 -->
           <div class="contact-block" id="copy-email-btn" data-email="afathousesmith@gmail.com" title="点击复制邮箱">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             <span class="contact-text" id="email-text">afathousesmith@gmail.com</span>
           </div>
           
-          <!-- GitHub 块（直接跳转） -->
+          <!-- GitHub 块 -->
           <a href="https://github.com/aFatOtakuSmith" target="_blank" rel="noopener" class="contact-block" title="前往 GitHub 主页">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
             <span class="contact-text">github.com/aFatOtakuSmith</span>
           </a>
         </div>
-
-        <!-- 下载按钮 -->
-        <a class="about-btn about-btn-primary" href="{% static 'core/files/resume.pdf' %}" download>下载简历</a>
       </div>
 
       <div class="about-skill-tags">
-        <h2>Tech_Stack</h2>
-        <span class="about-tag">C / C++</span>
-        <span class="about-tag">Python</span>
-        <span class="about-tag">ESP32</span>
-        <span class="about-tag">FreeRTOS</span>
+        <h2>技术栈</h2>
+        <span class="about-tag">Qt C++</span>
+        <span class="about-tag">Python / Django</span>
+        <span class="about-tag">C#</span>
+        <span class="about-tag">MQTT / WebSocket</span>
         <span class="about-tag">JavaScript</span>
-        <span class="about-tag">Django</span>
-        <span class="about-tag">UI/UX</span>
+        <span class="about-tag">ESP32</span>
+        <span class="about-tag">硬件调试</span>
       </div>
     </aside>
 
@@ -658,112 +596,89 @@
       <section id="about-intro" class="about-section">
         <h2>自我介绍</h2>
         <p>
-          你好，我是 aFatOtaku。一名专注于 <strong>嵌入式系统</strong> 与 <strong>Web 全栈开发</strong> 的工程师。
-          我喜欢游走在底层的硬件逻辑与上层的软件交互之间。
+          你好，我是莫晓。一名热衷于创造与折腾的开发者，游走在 <strong>嵌入式硬件</strong> 与 <strong>Web 全栈</strong> 的交界处。
         </p>
         <p>
-          在业余时间，我组乐队、写博客。音乐让我保持对节律的敏感，代码让我拥有创造世界的能力。
-          目前正在寻找相关的开发机会，希望加入一个不设限、重技术的团队。
+          目前，我将绝大多数精力投入到了个人的开源全栈项目 <strong>myDjangoWeb</strong> 的开发中。我喜欢将底层的传感器数据通过 MQTT 汇聚到云端，再用优雅的代码将它们展示在精美的网页上。在业余时间，我也组乐队、写博客，用代码记录生活。
         </p>
       </section>
 
-      <!-- 2. 求职意向 -->
-      <section id="about-intent" class="about-section">
-        <h2>求职意向</h2>
-        <div class="about-intent-grid">
-          <div class="about-intent-item">
-            <span class="about-intent-label">目标岗位</span>
-            <span class="about-intent-value">嵌入式工程师 / Web 开发</span>
-          </div>
-          <div class="about-intent-item">
-            <span class="about-intent-label">期望方向</span>
-            <span class="about-intent-value">物联网 / 智能硬件 / 全栈</span>
-          </div>
-          <div class="about-intent-item">
-            <span class="about-intent-label">可到岗时间</span>
-            <span class="about-intent-value">一个月内</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. 工作 / 项目经历 -->
+      <!-- 2. 项目经历 (仅保留 myDjangoWeb) -->
       <section id="about-experience" class="about-section">
-        <h2>项目经历</h2>
+        <h2>主导项目</h2>
 
         <article class="about-experience-item">
           <header class="about-experience-header">
-            <h3>STM32平衡车系统 (Smart Lighting)</h3>
-            <span class="about-experience-meta">主导开发者 · 2023.05 – 至今</span>
+            <h3>myDjangoWeb 个人全栈数字中枢</h3>
+            <span class="about-experience-meta">全栈开发 · 独立主导</span>
           </header>
           <ul class="about-experience-bullets">
-            <li>基于 STM32与 PID算法 实现的可以设置巡逻轨迹的平衡车系统。</li>
-            <li>完成硬件选型、PCB 设计以及基于 FreeRTOS 的底层固件编写。</li>
-            <li>开发配套的 Web 控制后台，实现局域网内低延迟控制与状态监控。</li>
+            <li>基于 <strong>Django 5.2</strong> 构建的高度集成化模块系统，涵盖博客、作品、待办习惯管理及沉浸式音乐播放等子系统。</li>
+            <li>设计并实现了 <strong>“前端直连读取 + 后端代理写入”</strong> 的混合物联网安全通信模型，利用 MQTT 与 WebSocket 实现硬件数据毫秒级推流及安全控制。</li>
+            <li>前端采用原生 HTML/CSS/JS 深度定制，实现了基于 ColorThief 的动态 UI 主题色渐变、歌词多端同步交互等极致的视觉与交互体验。</li>
+            <li>编写 Watchdog 自动化守护脚本，配合 Systemd 实现服务器后台任务的秒级监听、崩溃自启与自动化运维。</li>
           </ul>
-        </article>
-
-        <article class="about-experience-item">
-          <header class="about-experience-header">
-            <h3>个人博客 & 乐队主页</h3>
-            <span class="about-experience-meta">全栈开发 · 2022.10 – 至今</span>
-          </header>
-          <ul class="about-experience-bullets">
-            <li>使用 Django 搭建后端，结合 SQLite 处理数据存储与用户鉴权。</li>
-            <li>手写 CSS 与原生 JS，实现玻璃拟态、3D 倾斜与全局点击水波纹特效。</li>
-            <li>集成富文本编辑器，支持多作者协同发文与图片上传。</li>
-          </ul>
+          <a href="https://github.com/aFatOtakuSmith/myDjangoWeb" target="_blank" rel="noopener" class="about-btn about-btn-primary" style="width: auto; padding: 10px 24px; display: inline-flex;">查看项目源码 (GitHub) →</a>
         </article>
       </section>
 
-      <!-- 4. 技能清单 -->
+      <!-- 3. 技能清单 -->
       <section id="about-skills" class="about-section">
         <h2>技能清单</h2>
         <div class="about-skill-groups">
+          
           <div class="about-skill-group">
-            <h3>嵌入式开发</h3>
+            <h3>硬件与底层</h3>
             <ul>
-              <li>C / C++ 基础扎实</li>
-              <li>熟悉 ESP32 / Arduino 生态</li>
-              <li>了解 RTOS (FreeRTOS) 及外设驱动</li>
+              <li>熟练使用各类电工工具，具备扎实的硬件焊接与飞线能力</li>
+              <li>熟练使用示波器、万用表等仪器进行信号分析与硬件调试</li>
+              <li>ESP32 / FreeRTOS 嵌入式系统开发</li>
+              <li>传感器外设驱动开发与底层硬件通讯</li>
             </ul>
           </div>
+
           <div class="about-skill-group">
-            <h3>Web 开发</h3>
+            <h3>软件开发</h3>
             <ul>
-              <li>Python / Django 后端开发</li>
-              <li>HTML5 / CSS3 / JavaScript (ES6+)</li>
-              <li>响应式设计与前端动效实现</li>
+              <li>熟练使用 <strong>Qt C++</strong> 进行跨平台桌面级应用开发</li>
+              <li>熟练使用 <strong>Python</strong> 编写后端服务与自动化脚本</li>
+              <li>熟练使用 <strong>C#</strong> 开发上位机工具及配套软件</li>
+              <li>扎实的 C / C++ 基础，理解面向对象与内存管理</li>
             </ul>
           </div>
+
           <div class="about-skill-group">
-            <h3>工具与扩展</h3>
+            <h3>Web 与物联网全栈</h3>
             <ul>
-              <li>Git 版本控制</li>
-              <li>Linux 服务器基础运维</li>
-              <li>UI/UX 设计敏感度</li>
+              <li>Python / Django 框架深度开发 (MVT、ORM 映射)</li>
+              <li>MQTT / WebSocket / HTTP 协议及混合通信架构</li>
+              <li>HTML5 / CSS3 / 原生 JavaScript (ES6+) 响应式开发</li>
+              <li>前端动效渲染、玻璃拟态设计及动态主题色提取</li>
             </ul>
           </div>
+
+          <div class="about-skill-group">
+            <h3>工具与运维</h3>
+            <ul>
+              <li>Git 版本控制与代码协作规范</li>
+              <li>Linux 服务器基础运维与系统级排障</li>
+              <li>Systemd 守护进程托管与 Watchdog 自动化脚本</li>
+              <li>Nginx 反向代理配置与云服务器安全组策略</li>
+            </ul>
+          </div>
+
         </div>
       </section>
 
-      <!-- 5. 作品精选 -->
+      <!-- 4. 作品精选 -->
       <section id="about-works" class="about-section">
-        <h2>作品精选</h2>
+        <h2>开源作品</h2>
         <div class="about-works-grid">
-          <a class="about-work-card" href="/works">
-            <h3>STM32的平衡车</h3>
-            <p>涉及PID算法的硬件项目。</p>
-          </a>
-          <a class="about-work-card" href="/works">
-            <h3>多春鱼乐队主页</h3>
-            <p>沉浸式交互体验的 Django 全栈网站。</p>
-          </a>
-          <a class="about-work-card" href="/works">
-            <h3>开源小工具</h3>
-            <p>致力于提升开发效率的脚本与工具集。</p>
+          <a class="about-work-card" href="https://github.com/aFatOtakuSmith/myDjangoWeb" target="_blank">
+            <h3>myDjangoWeb</h3>
+            <p>集成了物联网监控、习惯打卡与沉浸式音乐播放的个人全栈数字中枢。</p>
           </a>
         </div>
-        <a class="about-btn about-btn-primary" style="width: auto; padding: 12px 28px;" href="/works">查看全部作品 →</a>
       </section>
 
     </main>

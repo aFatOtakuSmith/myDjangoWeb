@@ -31,12 +31,14 @@
 
     <!-- 应用卡片导航区 -->
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+        
         <!-- 音乐播放器 -->
         <a href="/music/" class="portal-card">
             <div class="portal-icon" style="background: #e0f2fe; color: #0ea5e9;">🎵</div>
             <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">时光留声机</h2>
             <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">进入专属音乐空间，查看歌词、管理歌单和收藏喜欢的歌曲。</p>
         </a>
+
         <!-- 计划表卡片 -->
         <a href="/todo/" class="portal-card">
             <div class="portal-icon" style="background: #fef3c7; color: #d97706;">📝</div>
@@ -44,13 +46,20 @@
             <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">记录今天需要完成的任务，支持新建、标记完成和删除。</p>
         </a>
 
+        <!-- 🌟 新增：小说系统入口 -->
+        <a href="/novel/" class="portal-card">
+            <div class="portal-icon" style="background: #f3e8ff; color: #9333ea;">📖</div>
+            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">我的书库</h2>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">查看已创作的小说，进入沉浸式阅读界面或前往后台续写章节。</p>
+        </a>
 
         <!-- 后台管理 -->
         <a href="/admin/" class="portal-card">
             <div class="portal-icon" style="background: #fce7f3; color: #db2777;">⚙️</div>
             <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">后台管理系统</h2>
-            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">管理网站数据，包括歌曲排序、批量上传、设备数据清理等。</p>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">管理网站数据，包括歌曲排序、小说连载、待办事项及设备数据清理。</p>
         </a>
+        
     </div>
 </div>
 {% endblock %}

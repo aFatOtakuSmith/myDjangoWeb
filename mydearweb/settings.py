@@ -25,8 +25,12 @@ SECRET_KEY = 'django-insecure-hsx$9@0@g0l7$joj5k%pfj7ax#tc498e!r^3mq@cix++)ht!jg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['106.15.37.66', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['106.15.37.66', 'twodonkeys.xin', 'www.twodonkeys.xin']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://twodonkeys.xin',
+    'https://www.twodonkeys.xin',
+]
 
 # Application definition
 
@@ -47,6 +51,9 @@ INSTALLED_APPS = [
     'iot',
     'music', 
     'todo',  # 🌟 核心：加上这一行！
+    'novel',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -179,3 +186,21 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 
 LOGIN_URL = '/login/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+import os
+
+# CKEditor 配置
+CKEDITOR_UPLOAD_PATH = "novel/images/"  # 上传图片的存储路径，位于 media 目录下
+CKEDITOR_IMAGE_BACKEND = "pillow"       # 使用 pillow 处理图片
+
+# 自定义工具栏
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # 使用完整工具栏
+        'height': 600,      # 编辑器高度
+        'width': '100%',    # 宽度
+        'language': 'zh-cn', # 中文界面
+    },
+}
