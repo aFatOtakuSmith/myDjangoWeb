@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑智能体 | {{ agent.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --primary: #0ea5e9; --primary-hover: #0284c7; --border: #e2e8f0; --input-bg: #f8fafc; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { min-height: 100vh; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(224, 242, 254, 0.6) 0%, transparent 50%); color: var(--text-main); padding: 40px 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; }
+        .nav-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .back-btn { text-decoration: none; color: var(--text-muted); font-size: 1.2rem; transition: 0.2s; }
+        .back-btn:hover { color: var(--primary); }
+        .nav-header h1 { font-size: 1.5rem; font-weight: 700; color: #0c4a6e; }
+        
+        .form-card { background: var(--card-bg); border-radius: 24px; padding: 40px; box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.1); border: 1px solid var(--border); }
+        .image-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px dashed var(--border); }
+        .upload-box { text-align: center; }
+        .upload-box label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 15px; }
+        .preview-area { width: 120px; height: 120px; margin: 0 auto 15px; border-radius: 50%; background: #f1f5f9; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: 0.2s; }
+        .preview-area.portrait-preview { width: 100%; max-width: 200px; height: 250px; border-radius: 16px; margin: 0 auto 15px; object-fit: contain; }
+        .preview-area:hover { border-color: var(--primary); background: #e0f2fe; }
+        .preview-area img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-area.portrait-preview img { object-fit: contain; }
+        .upload-btn { font-size: 0.85rem; color: var(--primary); background: #e0f2fe; padding: 6px 15px; border-radius: 20px; cursor: pointer; display: inline-block; transition: 0.2s; }
+        input[type="file"] { display: none; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.9rem; font-weight: 600; color: #334155; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; background: var(--input-bg); outline: none; transition: 0.3s; font-family: inherit; }
+        .form-control:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        textarea.form-control { resize: vertical; min-height: 120px; line-height: 1.6; }
+        
+        .params-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+        .range-value { font-size: 0.85rem; color: var(--primary); font-weight: bold; float: right; }
+        
+        .action-btns { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+        .submit-btn { padding: 16px 30px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25); }
+        .submit-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        
+        .delete-btn { padding: 16px 30px; background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .delete-btn:hover { background: #ef4444; color: #fff; border-color: #ef4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        
+        @media (max-width: 600px) { .image-upload-grid, .params-row { grid-template-columns: 1fr; } .form-card { padding: 25px; } .action-btns { flex-direction: column-reverse; gap: 15px; } .submit-btn, .delete-btn { width: 100%; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="nav-header">
+            <a href="{% url 'ai_chat:agent_list' %}" class="back-btn">←</a>
+            <h1>编辑属性 - {{ agent.name }}</h1>
+        </div>
+
+        <div class="form-card">
+            <!-- 主表单：保存修改 -->
+            <form method="post" enctype="multipart/form-data" id="editForm">
+                {% csrf_token %}
+                
+                <div class="image-upload-grid">
+                    <div class="upload-box">
+                        <label>修改头像</label>
+                        <div class="preview-area" onclick="document.getElementById('avatar-input').click()">
+                            {% if agent.avatar %}
+                                <img id="avatar-preview" src="{{ agent.avatar.url }}" alt="">
+                            {% else %}
+                                <img id="avatar-preview" src="" style="display:none;">
+                                <span id="avatar-icon" style="font-size: 2rem;">🤖</span>
+                            {% endif %}
+                        </div>
+                        <input type="file" id="avatar-input" name="avatar" accept="image/*" onchange="previewImg(this, 'avatar-preview', 'avatar-icon')">
+                        <label for="avatar-input" class="upload-btn">重新选择</label>
+                    </div>
+
+                    <div class="upload-box">
+                        <label>修改立绘</label>
+                        <div class="preview-area portrait-preview" onclick="document.getElementById('portrait-input').click()">
+                            {% if agent.portrait %}
+                                <img id="portrait-preview" src="{{ agent.portrait.url }}" alt="">
+                            {% else %}
+                                <img id="portrait-preview" src="" style="display:none;">
+                                <span id="portrait-icon" style="font-size: 2rem; color: #cbd5e1;">🖼️</span>
+                            {% endif %}
+                        </div>
+                        <input type="file" id="portrait-input" name="portrait" accept="image/*" onchange="previewImg(this, 'portrait-preview', 'portrait-icon')">
+                        <label for="portrait-input" class="upload-btn">重新选择</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>智能体名称</label>
+                    <input type="text" name="name" class="form-control" value="{{ agent.name }}" required>
+                </div>
+
+                <div class="input-group">
+                    <label>性格设定 (System Prompt)</label>
+                    <textarea name="system_prompt" class="form-control" required>{{ agent.system_prompt }}</textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>开场白</label>
+                    <input type="text" name="greeting" class="form-control" value="{{ agent.greeting }}">
+                </div>
+
+                <div class="params-row">
+                    <div class="input-group">
+                        <label>创造力 (Temperature) <span class="range-value" id="temp-val">{{ agent.temperature }}</span></label>
+                        <input type="range" name="temperature" min="0" max="1" step="0.1" value="{{ agent.temperature }}" oninput="document.getElementById('temp-val').innerText = this.value">
+                    </div>
+
+                    <div class="input-group">
+                        <label>专属 API Key</label>
+                        <input type="password" name="api_key" class="form-control" value="{{ agent.api_key }}" placeholder="留空使用系统默认">
+                    </div>
+                </div>
+
+                <div class="action-btns">
+                    <!-- 触发独立删除表单的按钮 -->
+                    <button type="button" class="delete-btn" onclick="confirmDelete()">🗑️ 删除此智能体</button>
+                    <button type="submit" class="submit-btn">保存修改</button>
+                </div>
+            </form>
+
+            <!-- 隐藏的独立删除表单 -->
+            <form id="deleteForm" method="post" action="{% url 'ai_chat:delete_agent' agent.id %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function previewImg(input, imgId, iconId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(imgId).src = e.target.result;
+                    document.getElementById(imgId).style.display = 'block';
+                    if(document.getElementById(iconId)) document.getElementById(iconId).style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function confirmDelete() {
+            if (confirm("警告：删除后，该智能体的所有聊天记录、头像和立绘将被彻底销毁，且无法恢复。确定要删除吗？")) {
+                document.getElementById('deleteForm').submit();
+            }
+        }
+    </script>
+</body>
+</html>

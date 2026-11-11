@@ -23,7 +23,7 @@
     <!-- 顶部欢迎栏 -->
     <div style="background: white; border-radius: 20px; padding: 30px 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
         <div>
-            <h1 style="color: #0c4a6e; margin: 0 0 8px 0; font-size: 1.8rem;">👋 欢迎回来, 莫晓!</h1>
+            <h1 style="color: #0c4a6e; margin: 0 0 8px 0; font-size: 1.8rem;">👋 欢迎回来, {{ display_name }}!</h1>
             <p style="color: #64748b; margin: 0;">这里是你的专属控制台，请选择你要进入的功能模块。</p>
         </div>
         <a href="{% url 'core:logout' %}" style="padding: 10px 20px; background: #fee2e2; color: #ef4444; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s;">退出登录</a>
@@ -32,33 +32,47 @@
     <!-- 应用卡片导航区 -->
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
         
-        <!-- 音乐播放器 -->
-        <a href="/music/" class="portal-card">
-            <div class="portal-icon" style="background: #e0f2fe; color: #0ea5e9;">🎵</div>
-            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">时光留声机</h2>
-            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">进入专属音乐空间，查看歌词、管理歌单和收藏喜欢的歌曲。</p>
+        <!-- 🌟 AI 智能体入口（所有用户可见） -->
+        <a href="/ai/" class="portal-card">
+            <div class="portal-icon" style="background: #dcfce7; color: #16a34a;">✨</div>
+            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">AI 智能体</h2>
+            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">进入 AI 聊天大厅，创建专属角色，体验沉浸式拟真对话。</p>
         </a>
 
-        <!-- 计划表卡片 -->
-        <a href="/todo/" class="portal-card">
-            <div class="portal-icon" style="background: #fef3c7; color: #d97706;">📝</div>
-            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">今日待办</h2>
-            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">记录今天需要完成的任务，支持新建、标记完成和删除。</p>
-        </a>
+        <!-- ========================================== -->
+        <!-- 🌟 以下卡片仅管理员或 moxiao 可见 -->
+        <!-- ========================================== -->
+        {% if user.is_superuser or user.username == 'moxiao' %}
+            
+            <!-- 音乐播放器 -->
+            <a href="/music/" class="portal-card">
+                <div class="portal-icon" style="background: #e0f2fe; color: #0ea5e9;">🎵</div>
+                <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">时光留声机</h2>
+                <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">进入专属音乐空间，查看歌词、管理歌单和收藏喜欢的歌曲。</p>
+            </a>
 
-        <!-- 🌟 新增：小说系统入口 -->
-        <a href="/novel/" class="portal-card">
-            <div class="portal-icon" style="background: #f3e8ff; color: #9333ea;">📖</div>
-            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">我的书库</h2>
-            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">查看已创作的小说，进入沉浸式阅读界面或前往后台续写章节。</p>
-        </a>
+            <!-- 计划表卡片 -->
+            <a href="/todo/" class="portal-card">
+                <div class="portal-icon" style="background: #fef3c7; color: #d97706;">📝</div>
+                <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">今日待办</h2>
+                <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">记录今天需要完成的任务，支持新建、标记完成和删除。</p>
+            </a>
 
-        <!-- 后台管理 -->
-        <a href="/admin/" class="portal-card">
-            <div class="portal-icon" style="background: #fce7f3; color: #db2777;">⚙️</div>
-            <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">后台管理系统</h2>
-            <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">管理网站数据，包括歌曲排序、小说连载、待办事项及设备数据清理。</p>
-        </a>
+            <!-- 小说系统入口 -->
+            <a href="/novel/" class="portal-card">
+                <div class="portal-icon" style="background: #f3e8ff; color: #9333ea;">📖</div>
+                <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">我的书库</h2>
+                <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">查看已创作的小说，进入沉浸式阅读界面或前往后台续写章节。</p>
+            </a>
+
+            <!-- 后台管理 -->
+            <a href="/admin/" class="portal-card">
+                <div class="portal-icon" style="background: #fce7f3; color: #db2777;">⚙️</div>
+                <h2 style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 1.2rem;">后台管理系统</h2>
+                <p style="color: #64748b; margin: 0; font-size: 0.9rem; line-height: 1.6;">管理网站数据，包括歌曲排序、小说连载、待办事项及设备数据清理。</p>
+            </a>
+
+        {% endif %}
         
     </div>
 </div>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>与 {{ agent.name }} 对话</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            /* 默认高级灰蓝底色 */
+            --bg-color: #f0f4f8; 
+            --text-main: #1e293b; 
+            --text-muted: #64748b;
+            --primary: #0ea5e9;
+            --user-bubble: linear-gradient(135deg, #0ea5e9, #3b82f6);
+            --ai-bubble: rgba(255, 255, 255, 0.75); /* 玻璃拟态 */
+            --border: rgba(226, 232, 240, 0.8);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            height: 100vh; display: flex; flex-direction: column; 
+            background-color: var(--bg-color);
+            transition: background-color 0.8s ease;
+            overflow: hidden; position: relative; 
+        }
+
+        /* 🌟 特色：动态极光背景光晕 */
+        .aurora-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; opacity: 0.6;
+            background: radial-gradient(circle at 10% 20%, var(--theme-light, #e0f2fe) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, var(--theme-light, #e0f2fe) 0%, transparent 40%);
+            transition: background 1s ease;
+        }
+
+        /* 🌟 左侧立绘展示容器 */
+        .portrait-container {
+            position: fixed;
+            bottom: 0;
+            left: 2%; /* 靠屏幕左侧 */
+            height: 85vh; /* 高度占据屏幕绝大部分 */
+            width: 35vw; /* 宽度自适应 */
+            max-width: 450px;
+            z-index: 1; /* 在极光背景之上，聊天内容之下 */
+            pointer-events: none; /* 鼠标点击穿透，不阻挡底层操作 */
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            /* 底部和左侧渐隐，让立绘自然融入背景 */
+            -webkit-mask-image: linear-gradient(to top, transparent 0%, black 15%);
+            mask-image: linear-gradient(to top, transparent 0%, black 15%);
+            opacity: 0.9;
+            /* 呼吸浮动动画 */
+            animation: breathe 5s ease-in-out infinite alternate;
+        }
+
+        .portrait-container img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(10px 15px 25px rgba(0,0,0,0.15));
+        }
+
+        @keyframes breathe {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-15px) scale(1.02); }
+        }
+
+        /* 顶部导航栏（悬浮磨砂玻璃） */
+        .header { 
+            padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); z-index: 10; 
+            position: relative;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { text-decoration: none; color: #334155; font-size: 1.2rem; font-weight: bold; transition: 0.2s; }
+        .back-btn:hover { color: var(--primary); }
+        .agent-info { display: flex; flex-direction: column; }
+        .agent-name { font-weight: 600; color: #0f172a; font-size: 1rem; }
+        
+        /* 对方正在输入状态 */
+        .status-text { font-size: 0.75rem; color: var(--primary); height: 16px; transition: opacity 0.3s; opacity: 0; font-weight: 500;}
+        .status-text.active { opacity: 1; }
+
+        .clear-btn { 
+            background: rgba(255,255,255,0.5); color: #64748b; border: 1px solid var(--border); 
+            padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; 
+        }
+        .clear-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fecaca; }
+
+        /* 聊天区 */
+        .chat-container { 
+            flex: 1; overflow-y: auto; padding: 30px 20px; 
+            display: flex; flex-direction: column; align-items: center; 
+            z-index: 5; position: relative;
+        }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .message-list { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 24px; }
+        
+        /* 消息行 */
+        .message-row { 
+            display: flex; gap: 16px; max-width: 85%; 
+            /* 呼吸浮现动画 */
+            animation: floatUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .user-row { align-self: flex-end; flex-direction: row-reverse; }
+        .ai-row { align-self: flex-start; }
+        
+        .avatar { 
+            width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.3rem; overflow: hidden; background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #fff;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 聊天气泡 */
+        .bubble { 
+            padding: 14px 20px; font-size: 0.95rem; line-height: 1.7; 
+            word-wrap: break-word; border-radius: 16px; position: relative;
+        }
+        /* 用户：深蓝渐变+白字 */
+        .user-row .bubble { 
+            background: var(--user-bubble); 
+            color: #ffffff; 
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+        }
+        /* AI：毛玻璃+深色字 */
+        .ai-row .bubble { 
+            background: var(--ai-bubble); 
+            color: var(--text-main); 
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Markdown 样式 */
+        .bubble p { margin-bottom: 8px; }
+        .bubble p:last-child { margin-bottom: 0; }
+        .bubble pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 10px 0; overflow-x: auto; font-family: 'Fira Code', monospace; font-size: 0.85rem; }
+        .bubble code { font-family: 'Fira Code', monospace; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; font-size: 0.85rem; }
+        .bubble pre code { background: transparent; padding: 0; }
+
+        /* 输入区：悬浮胶囊 */
+        .input-wrapper { 
+            padding: 20px; display: flex; justify-content: center; 
+            z-index: 10; position: relative;
+        }
+        .input-box { 
+            width: 100%; max-width: 800px; background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1); 
+            border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: flex; align-items: flex-end; padding: 8px 10px 8px 20px; transition: 0.3s; 
+        }
+        .input-box:focus-within { 
+            box-shadow: 0 10px 40px rgba(14, 165, 233, 0.15); 
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+        textarea { 
+            flex: 1; border: none; outline: none; resize: none; padding: 10px 0; 
+            font-size: 1rem; line-height: 1.5; max-height: 150px; background: transparent; color: var(--text-main); 
+        }
+        
+        .send-btn { 
+            background: var(--primary); color: white; border: none; border-radius: 16px; 
+            padding: 10px 18px; font-weight: 600; font-size: 0.95rem; cursor: pointer; 
+            transition: all 0.2s; margin-left: 10px; flex-shrink: 0;
+        }
+        .send-btn:hover { background: #0284c7; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
+        .send-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        @keyframes floatUp { 
+            from { opacity: 0; transform: translateY(15px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        /* 屏幕宽度小于 1100px 时（如平板或小窗口），隐藏立绘以防遮挡聊天内容 */
+        @media (max-width: 1100px) {
+            .portrait-container { display: none; }
+        }
+
+        @media (max-width: 600px) { 
+            .message-row { max-width: 95%; } 
+            .input-box { border-radius: 16px; padding: 6px 8px 6px 15px; }
+            .send-btn { border-radius: 12px; padding: 8px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 极光背景层 -->
+    <div class="aurora-bg" id="aurora-bg"></div>
+
+    <!-- 🌟 左侧立绘层 (仅在存在立绘且屏幕够宽时显示) -->
+    {% if agent.portrait %}
+    <div class="portrait-container">
+        <img src="{{ agent.portrait.url }}" alt="{{ agent.name }}">
+    </div>
+    {% endif %}
+
+    <div class="header">
+        <div class="header-left">
+            <a href="{% url 'ai_chat:agent_list' %}" class="back-btn">←</a>
+            <div class="agent-info">
+                <div class="agent-name">{{ agent.name }}</div>
+                <!-- 对方正在输入 -->
+                <div class="status-text" id="typing-status">对方正在输入...</div>
+            </div>
+        </div>
+        <button class="clear-btn" onclick="clearChat()">清空聊天</button>
+    </div>
+
+    <div class="chat-container" id="chat-container">
+        <div class="message-list" id="message-list">
+            {% for msg in chat_messages %}
+                <div class="message-row {% if msg.role == 'user' %}user-row{% else %}ai-row{% endif %}">
+                    <div class="avatar">
+                        {% if msg.role == 'user' %}👤{% else %}{% if agent.avatar %}<img src="{{ agent.avatar.url }}">{% else %}🤖{% endif %}{% endif %}
+                    </div>
+                    <div class="bubble markdown-body">{{ msg.content }}</div>
+                </div>
+            {% empty %}
+                <div class="message-row ai-row">
+                    <div class="avatar">{% if agent.avatar %}<img src="{{ agent.avatar.url }}">{% else %}🤖{% endif %}</div>
+                    <div class="bubble">{{ agent.greeting }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="input-wrapper">
+        <div class="input-box">
+            <textarea id="msg-input" rows="1" placeholder="发消息..."></textarea>
+            <button id="send-btn" class="send-btn">发送</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. 配置 Markdown
+        marked.setOptions({
+            breaks: true,
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            }
+        });
+
+        document.querySelectorAll('.markdown-body').forEach(el => {
+            el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText));
+            el.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
+        });
+
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatContainer = document.getElementById('chat-container');
+        const messageList = document.getElementById('message-list');
+        const typingStatus = document.getElementById('typing-status');
+        const agentId = "{{ agent.id }}";
+        const aiAvatarHtml = `{% if agent.avatar %}<img src="{{ agent.avatar.url }}">{% else %}🤖{% endif %}`;
+
+        // 2. 🌟 提取立绘主色，渲染极光背景
+        {% if agent.portrait %}
+        window.addEventListener('DOMContentLoaded', () => {
+            const img = new Image();
+            img.src = "{{ agent.portrait.url }}";
+            img.crossOrigin = "Anonymous"; 
+            img.onload = function() {
+                try {
+                    const colorThief = new ColorThief();
+                    const [r, g, b] = colorThief.getColor(img);
+                    
+                    // 极度稀释的颜色，用作背景底色和光晕
+                    const lightBg = `rgb(${Math.round(r + (255 - r) * 0.9)}, ${Math.round(g + (255 - g) * 0.9)}, ${Math.round(b + (255 - b) * 0.9)})`;
+                    const auroraColor = `rgb(${Math.round(r + (255 - r) * 0.6)}, ${Math.round(g + (255 - g) * 0.6)}, ${Math.round(b + (255 - b) * 0.6)})`;
+                    
+                    document.body.style.backgroundColor = lightBg;
+                    document.documentElement.style.setProperty('--theme-light', auroraColor);
+                } catch (e) {
+                    console.log("跨域限制或图片加载失败，使用默认背景");
+                }
+            };
+        });
+        {% endif %}
+
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        msgInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        function appendMessage(role, text) {
+            const row = document.createElement('div');
+            row.className = `message-row ${role === 'user' ? 'user-row' : 'ai-row'}`;
+            const avatar = role === 'user' ? '👤' : aiAvatarHtml;
+            row.innerHTML = `<div class="avatar">${avatar}</div><div class="bubble">${text}</div>`;
+            messageList.appendChild(row);
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+            return row.querySelector('.bubble');
+        }
+
+        async function sendMessage() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            msgInput.value = '';
+            msgInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            appendMessage('user', text);
+            typingStatus.classList.add('active');
+
+            try {
+                const response = await fetch('/ai/send/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ agent_id: agentId, message: text })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // 🌟 真人思考延迟（1秒 + 每字30毫秒，最大4.5秒）
+                    let delay = 1000 + (data.reply.length * 30);
+                    delay = Math.min(delay, 4500); 
+
+                    setTimeout(() => {
+                        typingStatus.classList.remove('active');
+                        
+                        const aiBubble = appendMessage('ai', '');
+                        aiBubble.innerHTML = DOMPurify.sanitize(marked.parse(data.reply));
+                        aiBubble.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
+                        
+                        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                        
+                        sendBtn.disabled = false;
+                        msgInput.focus();
+                    }, delay);
+
+                } else {
+                    typingStatus.classList.remove('active');
+                    appendMessage('ai', `<span style="color:#ef4444;">[出错了]: ${data.message}</span>`);
+                    sendBtn.disabled = false;
+                    msgInput.focus();
+                }
+            } catch (err) {
+                typingStatus.classList.remove('active');
+                appendMessage('ai', '<span style="color:#ef4444;">网络异常，请稍后再试。</span>');
+                sendBtn.disabled = false;
+                msgInput.focus();
+            }
+        }
+
+        function clearChat() {
+            if(confirm("确定要清空所有聊天记录吗？")) {
+                fetch(`/ai/clear/${agentId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(res => res.json()).then(data => {
+                    if(data.status === 'success') window.location.reload();
+                });
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        msgInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+    </script>
+</body>
+</html>

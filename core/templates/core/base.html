@@ -11,7 +11,159 @@
     
     <!-- 自定义 CSS -->
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
-</head>
+    <!-- 🌟 可拖动的 AI 悬浮助手 -->
+    <div id="draggable-ai" style="position: fixed; z-index: 9999; cursor: grab; user-select: none; touch-action: none;">
+        <div style="background: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); border: 2px solid #bae6fd; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 20px rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(14, 165, 233, 0.3)'">
+            <span style="font-size: 2rem; line-height: 1;">🤖</span>
+        </div>
+    </div>
+
+    <script>
+        const aiBtn = document.getElementById('draggable-ai');
+        let isDragging = false;
+        let hasMoved = false;
+        let offsetX, offsetY;
+
+        // 🌟 1. 页面加载时，读取本地存储的位置
+        function loadPosition() {
+            const savedPos = localStorage.getItem('aiBtnPosition');
+            if (savedPos) {
+                try {
+                    const pos = JSON.parse(savedPos);
+                    let left = parseFloat(pos.left);
+                    let top = parseFloat(pos.top);
+
+                    // 边界限制：防止用户缩小窗口后，按钮跑到屏幕外
+                    const maxX = window.innerWidth - 60;
+                    const maxY = window.innerHeight - 60;
+                    left = Math.max(0, Math.min(left, maxX));
+                    top = Math.max(0, Math.min(top, maxY));
+
+                    aiBtn.style.bottom = 'auto';
+                    aiBtn.style.right = 'auto';
+                    aiBtn.style.left = left + 'px';
+                    aiBtn.style.top = top + 'px';
+                } catch (e) {
+                    console.log('位置读取失败');
+                }
+            } else {
+                // 如果没有记录，默认放在右下角
+                aiBtn.style.bottom = '80px';
+                aiBtn.style.right = '30px';
+            }
+        }
+
+        // 初始化执行一次
+        loadPosition();
+        // 如果窗口大小改变，重新计算一次防止越界
+        window.addEventListener('resize', loadPosition);
+
+        // 🌟 2. 拖拽时保存位置
+        function savePosition() {
+            localStorage.setItem('aiBtnPosition', JSON.stringify({
+                left: aiBtn.style.left,
+                top: aiBtn.style.top
+            }));
+        }
+
+        // 鼠标按下
+        aiBtn.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            hasMoved = false;
+            aiBtn.style.cursor = 'grabbing';
+            
+            const rect = aiBtn.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            // 统一用 left/top 控制
+            aiBtn.style.bottom = 'auto';
+            aiBtn.style.right = 'auto';
+            aiBtn.style.left = rect.left + 'px';
+            aiBtn.style.top = rect.top + 'px';
+        });
+
+        // 鼠标移动
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            let newX = e.clientX - offsetX;
+            let newY = e.clientY - offsetY;
+            
+            if (Math.abs(e.movementX) > 2 || Math.abs(e.movementY) > 2) {
+                hasMoved = true;
+            }
+            
+            const maxX = window.innerWidth - aiBtn.offsetWidth;
+            const maxY = window.innerHeight - aiBtn.offsetHeight;
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+
+            aiBtn.style.left = newX + 'px';
+            aiBtn.style.top = newY + 'px';
+        });
+
+        // 鼠标松开
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            aiBtn.style.cursor = 'grab';
+            if (hasMoved) {
+                savePosition(); // 🌟 松开时保存最终位置
+            }
+        });
+
+        // 点击跳转
+        aiBtn.addEventListener('click', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                return;
+            }
+            window.location.href = '/ai/';
+        });
+
+        // 🌟 移动端触摸事件适配
+        aiBtn.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            hasMoved = false;
+            const touch = e.touches[0];
+            const rect = aiBtn.getBoundingClientRect();
+            offsetX = touch.clientX - rect.left;
+            offsetY = touch.clientY - rect.top;
+            
+            aiBtn.style.bottom = 'auto';
+            aiBtn.style.right = 'auto';
+            aiBtn.style.left = rect.left + 'px';
+            aiBtn.style.top = rect.top + 'px';
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            
+            if (Math.abs(touch.clientX - (parseFloat(aiBtn.style.left) + offsetX)) > 2 || Math.abs(touch.clientY - (parseFloat(aiBtn.style.top) + offsetY)) > 2) {
+                hasMoved = true;
+            }
+
+            let newX = touch.clientX - offsetX;
+            let newY = touch.clientY - offsetY;
+            
+            const maxX = window.innerWidth - aiBtn.offsetWidth;
+            const maxY = window.innerHeight - aiBtn.offsetHeight;
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+
+            aiBtn.style.left = newX + 'px';
+            aiBtn.style.top = newY + 'px';
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+            if (hasMoved) {
+                savePosition(); // 🌟 触摸结束时保存最终位置
+            }
+        });
+    </script>
 <body class="d-flex flex-column min-vh-100">
 
     <!-- 顶部导航栏 -->

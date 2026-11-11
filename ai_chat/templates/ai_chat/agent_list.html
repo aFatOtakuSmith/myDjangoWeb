@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 智能体库</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-start: #e0f2fe;
+            --bg-end: #f8fafc;
+            --primary: #0ea5e9;
+            --primary-light: #bae6fd;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.65);
+            --card-border: rgba(255, 255, 255, 0.9);
+            --shadow-color: rgba(56, 189, 248, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            color: var(--text-main);
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 1s ease;
+        }
+
+        /* 飘落粒子特效 */
+        .particle {
+            position: fixed;
+            top: -20px;
+            pointer-events: none;
+            z-index: 0;
+            animation: fall linear forwards;
+            user-select: none;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(360deg); }
+        }
+
+        /* 顶部导航与用户信息区 */
+        .top-nav {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 左上角标题（纯文本，无链接） */
+        .header-title h1 {
+            color: var(--text-main);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* 🌟 右上角用户信息卡片（加上了 a 标签，点击跳转主页） */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            padding: 8px 16px 8px 8px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            text-decoration: none; /* 去除 a 标签下划线 */
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .user-profile:hover {
+            box-shadow: 0 6px 20px var(--shadow-color);
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            border: 2px solid #fff;
+            font-weight: bold;
+        }
+
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+        .user-status {
+            font-size: 0.75rem; color: var(--primary);
+            display: flex; align-items: center; gap: 4px; font-weight: 600;
+        }
+
+        /* AI 网格布局 */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 基础卡片样式 */
+        .agent-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px var(--shadow-color);
+            border-color: var(--primary-light);
+        }
+
+        /* 编辑按钮 */
+        .edit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            z-index: 20;
+            border: 1px solid #e2e8f0;
+        }
+        .edit-btn:hover {
+            background: #fff;
+            color: var(--primary);
+            transform: rotate(90deg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .agent-link {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 头像 */
+        .avatar-wrapper {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #f8fafc; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; border: 2px solid #ffffff;
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+        .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-wrapper .default-avatar { font-size: 1.8rem; color: var(--primary); }
+
+        .agent-name {
+            color: var(--text-main); font-size: 1.25rem;
+            font-weight: 700; margin-bottom: 8px;
+        }
+        .agent-desc {
+            color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden; flex: 1;
+        }
+
+        .card-footer {
+            margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid rgba(226, 232, 240, 0.6);
+            display: flex; justify-content: space-between;
+            align-items: center; font-size: 0.8rem;
+            color: var(--text-muted); font-weight: 500;
+        }
+
+        /* 新建节点卡片 */
+        .add-card {
+            border: 2px dashed var(--primary-light);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: none; align-items: center; justify-content: center;
+            min-height: 250px; cursor: pointer; text-decoration: none;
+        }
+        .add-card:hover {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.7);
+            transform: translateY(-6px);
+        }
+        .add-icon {
+            font-size: 2.5rem; color: var(--primary);
+            margin-bottom: 15px; line-height: 1; transition: 0.3s;
+        }
+        .add-card:hover .add-icon { transform: scale(1.1); }
+        .add-card .agent-name { color: var(--primary); font-size: 1.1rem; margin: 0; }
+        .add-card .agent-desc { text-align: center; color: var(--text-muted); flex: none; margin-top: 5px; }
+
+        @media (max-width: 600px) {
+            .top-nav { flex-direction: column; align-items: flex-start; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航栏与用户信息 -->
+    <div class="top-nav">
+        <!-- 左上角：纯文本，无链接 -->
+        <div class="header-title">
+            <h1>AI 智能体库</h1>
+            <p>选择一位智能体开始对话，或创建新的专属角色</p>
+        </div>
+        
+        <!-- 🌟 右上角：用户信息卡片，点击跳转到个人主页 -->
+        <a href="{% url 'core:profile' %}" class="user-profile" title="返回个人主页">
+            <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
+            <div class="user-info">
+                <span class="user-name">{{ user.username }}</span>
+                <span class="user-status">已登录</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- AI 网格 -->
+    <div class="agent-grid">
+        
+        <!-- 渲染智能体 -->
+        {% for agent in agents %}
+        <div class="agent-card">
+            <!-- 右上角编辑按钮 -->
+            <a href="{% url 'ai_chat:edit_agent' agent.id %}" class="edit-btn" title="编辑属性">⚙️</a>
+            
+            <!-- 点击主体进入聊天 -->
+            <a href="{% url 'ai_chat:chat_room' agent.id %}" class="agent-link">
+                <div class="avatar-wrapper">
+                    {% if agent.avatar %}
+                        <img src="{{ agent.avatar.url }}" alt="{{ agent.name }}">
+                    {% else %}
+                        <span class="default-avatar">🤖</span>
+                    {% endif %}
+                </div>
+                <div class="agent-name">{{ agent.name }}</div>
+                <div class="agent-desc">{{ agent.system_prompt }}</div>
+                
+                <div class="card-footer">
+                    <span>在线</span>
+                    <span>开始对话 →</span>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+
+        <!-- 新建入口 -->
+        <a href="{% url 'ai_chat:create_agent' %}" class="agent-card add-card">
+            <div class="add-icon">+</div>
+            <div class="agent-name">新建智能体</div>
+            <div class="agent-desc">创建你的全新 AI 助手</div>
+        </a>
+        
+    </div>
+
+    <script>
+        // 四季个性化配置
+        const themes = [
+            { name: 'spring', bgStart: '#f0fdf4', bgEnd: '#fdf2f8', primary: '#10b981', primaryLight: '#a7f3d0', shadow: 'rgba(16, 185, 129, 0.15)', particles: ['🌸', '🌺', '🌼', '🌷'], interval: 500 },
+            { name: 'summer', bgStart: '#e0f2fe', bgEnd: '#fef08a', primary: '#f59e0b', primaryLight: '#fde68a', shadow: 'rgba(245, 158, 11, 0.15)', particles: ['☀️', '🌞', '🔆'], interval: 400 },
+            { name: 'autumn', bgStart: '#fff7ed', bgEnd: '#fef3c7', primary: '#d97706', primaryLight: '#fde68a', shadow: 'rgba(217, 119, 6, 0.15)', particles: ['🍂', '🍁', '🍁', '🍂'], interval: 500 },
+            { name: 'winter', bgStart: '#dbeafe', bgEnd: '#f8fafc', primary: '#38bdf8', primaryLight: '#bae6fd', shadow: 'rgba(56, 189, 248, 0.15)', particles: ['❅', '❆', '❄', '❄'], interval: 300 }
+        ];
+
+        const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+
+        document.documentElement.style.setProperty('--bg-start', randomTheme.bgStart);
+        document.documentElement.style.setProperty('--bg-end', randomTheme.bgEnd);
+        document.documentElement.style.setProperty('--primary', randomTheme.primary);
+        document.documentElement.style.setProperty('--primary-light', randomTheme.primaryLight);
+        document.documentElement.style.setProperty('--shadow-color', randomTheme.shadow);
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            const emoji = randomTheme.particles[Math.floor(Math.random() * randomTheme.particles.length)];
+            particle.innerHTML = emoji;
+            
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.fontSize = (Math.random() * 10 + 12) + 'px';
+            particle.style.opacity = Math.random() * 0.6 + 0.4;
+            
+            if (randomTheme.name === 'winter') {
+                particle.style.textShadow = '0 0 5px rgba(255,255,255,0.8)';
+            }
+
+            const duration = Math.random() * 5 + 6;
+            particle.style.animationDuration = duration + 's';
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }
+
+        setInterval(createParticle, randomTheme.interval);
+    </script>
+</body>
+</html>

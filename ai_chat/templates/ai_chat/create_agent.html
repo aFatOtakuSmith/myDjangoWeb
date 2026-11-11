@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建角色 | Where Time Meets the Sea</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --primary: #0ea5e9; --primary-hover: #0284c7; --border: #e2e8f0; --input-bg: #f8fafc; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { min-height: 100vh; background-color: var(--bg-color); background-image: radial-gradient(circle at 50% 0%, rgba(224, 242, 254, 0.6) 0%, transparent 50%); color: var(--text-main); padding: 40px 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; }
+        .nav-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .back-btn { text-decoration: none; color: var(--text-muted); font-size: 1.2rem; }
+        .nav-header h1 { font-size: 1.5rem; font-weight: 700; color: #0c4a6e; }
+        
+        .form-card { background: var(--card-bg); border-radius: 24px; padding: 40px; box-shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.1); border: 1px solid var(--border); }
+        
+        /* 角色卡导入区 */
+        .import-box {
+            background: #f0f9ff; border: 2px dashed #bae6fd; border-radius: 16px;
+            padding: 20px; text-align: center; margin-bottom: 30px; transition: 0.3s;
+        }
+        .import-box:hover { background: #e0f2fe; border-color: var(--primary); }
+        .import-box p { font-size: 0.9rem; color: #0284c7; margin-bottom: 10px; font-weight: 600;}
+        .import-btn { background: var(--primary); color: #fff; padding: 8px 20px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; display: inline-block; border: none;}
+        .import-btn:hover { background: var(--primary-hover); }
+        input[type="file"] { display: none; }
+
+        /* 图片上传 */
+        .image-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px dashed var(--border); }
+        .upload-box { text-align: center; }
+        .preview-area { width: 120px; height: 120px; margin: 0 auto 15px; border-radius: 50%; background: #f1f5f9; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+        .preview-area.portrait-preview { width: 100%; max-width: 200px; height: 250px; border-radius: 16px; object-fit: contain; }
+        .preview-area img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .upload-btn { font-size: 0.85rem; color: var(--primary); background: #e0f2fe; padding: 6px 15px; border-radius: 20px; cursor: pointer; }
+        
+        /* 输入区 */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.9rem; font-weight: 600; color: #334155; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 0.95rem; background: var(--input-bg); outline: none; }
+        .form-control:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        textarea.form-control { min-height: 120px; line-height: 1.6; }
+        .params-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .submit-btn { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        @media (max-width: 600px) { .image-upload-grid, .params-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="nav-header">
+            <a href="{% url 'ai_chat:agent_list' %}" class="back-btn">←</a>
+            <h1>创建新角色</h1>
+        </div>
+
+        <div class="form-card">
+            
+            <!-- 🌟 角色卡导入区 -->
+            <div class="import-box">
+                <p>🎭 支持导入 SillyTavern V2 角色卡 (.json)</p>
+                <label for="card-upload" class="import-btn">选择 JSON 文件并自动填表</label>
+                <input type="file" id="card-upload" accept=".json">
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- 隐藏字段，用于存储解析出的高级角色卡数据 -->
+                <input type="hidden" name="description" id="id_description">
+                <input type="hidden" name="personality" id="id_personality">
+                <input type="hidden" name="mes_example" id="id_mes_example">
+                <input type="hidden" name="character_book" id="id_character_book">
+
+                <div class="image-upload-grid">
+                    <div class="upload-box">
+                        <label>上传头像 (小图)</label>
+                        <div class="preview-area" onclick="document.getElementById('avatar-input').click()">
+                            <img id="avatar-preview">
+                            <span id="avatar-icon" style="font-size: 2rem;">🤖</span>
+                        </div>
+                        <input type="file" id="avatar-input" name="avatar" accept="image/*" onchange="previewImg(this, 'avatar-preview', 'avatar-icon')">
+                        <label for="avatar-input" class="upload-btn">选择头像</label>
+                    </div>
+
+                    <div class="upload-box">
+                        <label>上传立绘 (大图)</label>
+                        <div class="preview-area portrait-preview" onclick="document.getElementById('portrait-input').click()">
+                            <img id="portrait-preview">
+                            <span id="portrait-icon" style="font-size: 2rem; color: #cbd5e1;">🖼️</span>
+                        </div>
+                        <input type="file" id="portrait-input" name="portrait" accept="image/*" onchange="previewImg(this, 'portrait-preview', 'portrait-icon')">
+                        <label for="portrait-input" class="upload-btn">选择立绘</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>角色名称</label>
+                    <input type="text" name="name" id="id_name" class="form-control" placeholder="例如：赛博树洞、暴躁老哥" required>
+                </div>
+
+                <div class="input-group">
+                    <label>角色设定 (System Prompt / 性格设定)</label>
+                    <textarea name="system_prompt" id="id_system_prompt" class="form-control" placeholder="描述角色的背景、性格、说话方式等。如果导入了角色卡，这里会自动合并核心设定。" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>开场白</label>
+                    <input type="text" name="greeting" id="id_greeting" class="form-control" placeholder="它和你的第一句话是什么？" value="你好，我是你的专属 AI。">
+                </div>
+
+                <div class="params-row">
+                    <div class="input-group">
+                        <label>专属 API Key (选填)</label>
+                        <input type="password" name="api_key" class="form-control" placeholder="留空则使用系统默认">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">✨ 确认创建</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 图片本地预览
+        function previewImg(input, imgId, iconId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(imgId).src = e.target.result;
+                    document.getElementById(imgId).style.display = 'block';
+                    document.getElementById(iconId).style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 🌟 核心：解析角色卡 JSON
+        document.getElementById('card-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const rawData = JSON.parse(event.target.result);
+                    // 兼容 V1 和 V2 格式
+                    const data = rawData.data || rawData; 
+                    
+                    // 1. 基础信息填充
+                    document.getElementById('id_name').value = data.name || '';
+                    
+                    // 2. 合并核心设定
+                    let combinedPrompt = "";
+                    if (data.description) combinedPrompt += `【外貌与背景】\n${data.description}\n\n`;
+                    if (data.personality) combinedPrompt += `【性格特点】\n${data.personality}\n\n`;
+                    if (data.scenario) combinedPrompt += `【当前场景】\n${data.scenario}\n\n`;
+                    if (data.system_prompt) combinedPrompt += `【核心设定】\n${data.system_prompt}\n\n`;
+                    
+                    document.getElementById('id_system_prompt').value = combinedPrompt.trim();
+                    
+                    // 3. 开场白
+                    if (data.first_mes) {
+                        document.getElementById('id_greeting').value = data.first_mes;
+                    }
+
+                    // 4. 存入隐藏字段，供后端发送消息时使用
+                    document.getElementById('id_description').value = data.description || '';
+                    document.getElementById('id_personality').value = data.personality || '';
+                    document.getElementById('id_mes_example').value = data.mes_example || '';
+                    if (data.character_book) {
+                        document.getElementById('id_character_book').value = JSON.stringify(data.character_book);
+                    }
+
+                    alert('✅ 角色卡解析成功！请检查下方表单并补充头像/立绘。');
+                } catch(err) {
+                    console.error(err);
+                    alert('❌ 解析失败：这不是一个标准的 JSON 角色卡文件。');
+                }
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

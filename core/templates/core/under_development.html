@@ -10,9 +10,17 @@
             抱歉，该页面目前仅对站长开放。<br>
             更多神奇的功能正在加急赶工中，敬请期待！
         </p>
-        <a href="{% url 'core:index' %}" style="display: inline-block; padding: 10px 24px; background: #0ea5e9; color: white; border-radius: 10px; text-decoration: none; font-weight: bold;">
-            返回首页
-        </a>
+        
+        <!-- 并排的两个按钮 -->
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'core:index' %}" style="display: inline-block; padding: 10px 24px; background: #0ea5e9; color: white; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s;" onmouseover="this.style.background='#0284c7'" onmouseout="this.style.background='#0ea5e9'">
+                返回首页
+            </a>
+            
+            <a href="{% url 'core:logout' %}" style="display: inline-block; padding: 10px 24px; background: #fee2e2; color: #ef4444; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
+                退出登录
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

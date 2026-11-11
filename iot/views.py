@@ -22,7 +22,7 @@ def control_device(request, device_id, field, value):
             payload_dict = {field: value}
             payload = json.dumps(payload_dict)
             
-            # 2. 拼接下发主题
+            # 2. 拼接下发主题+
             topic = f"myhome/device/{device_id}/cmd"
             
             # 3. 打印日志，方便你在 Django 终端查看是否真的触发了下发

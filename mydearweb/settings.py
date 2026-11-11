@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-hsx$9@0@g0l7$joj5k%pfj7ax#tc498e!r^3mq@cix++)ht!jg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['106.15.37.66', 'twodonkeys.xin', 'www.twodonkeys.xin']
 
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'novel',
     'ckeditor',
     'ckeditor_uploader',
+    'ai_chat',
 ]
 
 MIDDLEWARE = [
@@ -204,3 +205,7 @@ CKEDITOR_CONFIGS = {
         'language': 'zh-cn', # 中文界面
     },
 }
+
+AI_DEFAULT_API_KEY = "sk-fb7cb4252d8a462cabfe6b7c357d8a63"  # 一定要换成你申请到的 DeepSeek Key
+AI_BASE_URL = "https://api.deepseek.com"
+AI_MODEL_NAME = "deepseek-chat"

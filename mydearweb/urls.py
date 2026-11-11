@@ -31,7 +31,7 @@ urlpatterns = [
       path('todo/', include('todo.urls')), # 🌟 新增
       path('novel/', include('novel.urls')), # 🌟 新增这一行
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('novel/', include('novel.urls')),
+    path('ai/', include('ai_chat.urls')),  # 🌟 新增
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
