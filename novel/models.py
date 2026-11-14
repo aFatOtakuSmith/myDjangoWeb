@@ -1,65 +1,106 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# ==========================================
-# 模型 1：小说信息表（存储所有小说）
-# ==========================================
+# 1. 书籍 (Book)
 class Novel(models.Model):
-    STATUS_CHOICES = [
-        ('ongoing', '连载中'), 
-        ('completed', '已完结')
-    ]
+    STATUS_CHOICES = [('ongoing', '连载中'), ('completed', '已完结')]
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     title = models.CharField('书名', max_length=100)
-    # 关联作者，如果你有多位作者，或者以后开放给别人写
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
     cover = models.ImageField('封面图', upload_to='novel/covers/', blank=True, null=True)
     summary = models.TextField('简介', max_length=1000, blank=True)
     status = models.CharField('状态', max_length=20, choices=STATUS_CHOICES, default='ongoing')
-    
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
     updated_at = models.DateTimeField('最后更新时间', auto_now=True)
 
     class Meta:
-        verbose_name = '小说'
-        verbose_name_plural = '小说'
-        ordering = ['-updated_at'] # 默认按最近更新排序
+        verbose_name = '书籍'
+        verbose_name_plural = '书籍'
+        ordering = ['-updated_at']
 
     def __str__(self):
         return self.title
 
     @property
     def total_words(self):
-        """动态计算这本书的总字数"""
-        return sum(chapter.word_count for chapter in self.chapters.all())
+        # 动态计算全书总字数
+        chapters = Chapter.objects.filter(volume__novel=self)
+        return sum(chapter.word_count for chapter in chapters)
 
-    @property
-    def latest_chapter(self):
-        """获取最新章节，方便在首页展示"""
-        return self.chapters.order_by('-sort_order').first()
-
-# ==========================================
-# 模型 2：章节内容表（用来写小说）
-# ==========================================
-class Chapter(models.Model):
-    # 外键关联上面的 Novel，related_name='chapters' 方便反向查询
-    novel = models.ForeignKey(Novel, on_delete=models.CASCADE, related_name='chapters', verbose_name='所属小说')
-    title = models.CharField('章节名', max_length=200) # 比如：第一章 初入江湖
-    content = models.TextField('正文内容')
-    sort_order = models.PositiveIntegerField('章节排序', default=0, help_text='数字越小越靠前')
-    word_count = models.PositiveIntegerField('字数', default=0, editable=False)
-    created_at = models.DateTimeField('发布时间', auto_now_add=True)
+# 2. 卷 (Volume) - 比如：第一卷 初入江湖
+class Volume(models.Model):
+    novel = models.ForeignKey(Novel, on_delete=models.CASCADE, related_name='volumes', verbose_name='所属书籍')
+    title = models.CharField('卷名', max_length=100)
+    sort_order = models.PositiveIntegerField('排序(越小越靠前)', default=0)
 
     class Meta:
-        ordering = ['sort_order', 'created_at'] # 按序号正序排列
-        verbose_name = '章节'
-        verbose_name_plural = '章节'
+        verbose_name = '卷'
+        verbose_name_plural = '卷'
+        ordering = ['sort_order', 'id']
 
     def __str__(self):
         return f"{self.novel.title} - {self.title}"
 
+# 3. 章节 (Chapter)
+class Chapter(models.Model):
+    volume = models.ForeignKey(Volume, on_delete=models.CASCADE, related_name='chapters', verbose_name='所属卷')
+    title = models.CharField('章节名', max_length=200)
+    content = models.TextField('正文内容', blank=True)
+    sort_order = models.PositiveIntegerField('排序(越小越靠前)', default=0)
+    word_count = models.PositiveIntegerField('字数', default=0, editable=False)
+    created_at = models.DateTimeField('创建时间', auto_now_add=True)
+    updated_at = models.DateTimeField('最后更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '章节'
+        verbose_name_plural = '章节'
+        ordering = ['sort_order', 'id']
+
+    def __str__(self):
+        return f"{self.volume.title} - {self.title}"
+
     def save(self, *args, **kwargs):
-        # 🌟 核心逻辑：在保存章节时，自动计算正文字数（去除空格和换行）
-        clean_text = self.content.replace('\n', '').replace(' ', '').replace('\r', '')
-        self.word_count = len(clean_text)
+        # 自动统计字数（去除空格和换行）
+        if self.content:
+            clean_text = self.content.replace('\n', '').replace(' ', '').replace('\r', '')
+            self.word_count = len(clean_text)
         super().save(*args, **kwargs)
+
+# 4. 设定集 (Setting) - 世界观、角色卡
+class Setting(models.Model):
+    novel = models.ForeignKey(Novel, on_delete=models.CASCADE, related_name='settings', verbose_name='所属书籍')
+    title = models.CharField('设定名称', max_length=100)
+    content = models.TextField('设定内容')
+    updated_at = models.DateTimeField('更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '设定集'
+        verbose_name_plural = '设定集'
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.novel.title} - {self.title}"
+
+        # 替换你原本的 Setting 模型
+class Setting(models.Model):
+    CATEGORY_CHOICES = [
+        ('character', '👤 角色档案'),
+        ('world', '🌍 世界观'),
+        ('item', '⚔️ 道具/物品'),
+        ('other', '📝 其他'),
+    ]
+    
+    novel = models.ForeignKey(Novel, on_delete=models.CASCADE, related_name='settings', verbose_name='所属书籍')
+    category = models.CharField('分类', max_length=20, choices=CATEGORY_CHOICES, default='character')
+    title = models.CharField('设定名称', max_length=100)
+    content = models.TextField('设定内容')
+    sort_order = models.PositiveIntegerField('排序', default=0)  # 🌟 新增
+    updated_at = models.DateTimeField('更新时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '设定集'
+        verbose_name_plural = '设定集'
+        ordering = ['sort_order', '-updated_at']  # 🌟 按排序字段优先
+
+    def __str__(self):
+        return f"{self.novel.title} - {self.title}"

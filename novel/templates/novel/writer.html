@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写作台 - {{ novel.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root {
+            --bg-sidebar: #f8fafc; --bg-editor: #ffffff; --text-main: #1e293b;
+            --text-muted: #64748b; --primary: #0ea5e9; --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; height: 100vh; overflow: hidden; background: var(--bg-editor); color: var(--text-main); position: relative; }
+
+        /* ================= 左侧侧边栏 ================= */
+        .sidebar {
+            width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
+        }
+        .sidebar-header {
+            padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+        }
+        .sidebar-header h2 { font-size: 1.1rem; color: #0c4a6e; margin: 0; }
+        .back-btn { text-decoration: none; color: var(--text-muted); font-size: 1.2rem; }
+        
+        .chapter-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .chapter-list::-webkit-scrollbar { width: 4px; }
+        .chapter-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+        .volume-wrapper { margin-bottom: 10px; }
+        .volume-title {
+            font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+            padding: 10px; display: flex; justify-content: space-between; align-items: center;
+            background: #e2e8f0; border-radius: 6px; cursor: grab;
+        }
+        .volume-title:active { cursor: grabbing; }
+        .chapter-container { padding-left: 10px; margin-top: 5px; min-height: 10px;}
+        
+        .add-btn { cursor: pointer; color: var(--primary); font-size: 1.2rem; font-weight: bold; user-select: none; }
+        .del-btn { cursor: pointer; color: #ef4444; font-size: 0.8rem; visibility: hidden; }
+        .edit-btn { cursor: pointer; color: #64748b; font-size: 0.85rem; visibility: hidden; margin-right: 5px; }
+        
+        .chapter-item {
+            padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+            color: var(--text-main); transition: 0.2s; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2px; background: transparent; cursor: grab;
+        }
+        .chapter-item:active { cursor: grabbing; }
+        .chapter-item:hover { background: #e2e8f0; }
+        .chapter-item:hover .del-btn { visibility: visible; }
+        .chapter-item.active { background: #e0f2fe; color: #0ea5e9; font-weight: 600; }
+        
+        .volume-title:hover .del-btn { visibility: visible; }
+        .volume-title:hover .edit-btn { visibility: visible; }
+
+        /* ================= 中间编辑区 ================= */
+        .editor-container { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .toolbar {
+            padding: 15px 40px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+        }
+        .book-title { font-weight: 600; color: var(--text-muted); font-size: 0.95rem; }
+        .status { font-size: 0.85rem; color: #10b981; transition: 0.3s; opacity: 0; }
+        .word-count { font-family: monospace; font-size: 0.85rem; color: var(--text-muted); }
+        
+        .toolbar-right { display: flex; align-items: center; gap: 10px; }
+        .setting-btn {
+            background: #f1f5f9; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px;
+            cursor: pointer; font-size: 0.85rem; color: #475569; transition: 0.2s;
+        }
+        .setting-btn:hover { background: #e0f2fe; color: #0ea5e9; border-color: #bae6fd; }
+
+        .editor-area { flex: 1; padding: 40px 60px; overflow-y: auto; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; width: 100%; }
+        input.chapter-title { width: 100%; border: none; outline: none; font-size: 2rem; font-weight: 700; color: #0f172a; margin-bottom: 30px; background: transparent; }
+        textarea.chapter-content { width: 100%; flex: 1; border: none; outline: none; resize: none; font-size: 1.15rem; line-height: 1.9; color: #334155; background: transparent; }
+
+        /* ================= 右侧设定集抽屉 ================= */
+        .settings-drawer {
+            position: absolute; top: 0; right: -400px; width: 400px; height: 100vh;
+            background: white; border-left: 1px solid var(--border); box-shadow: -5px 0 25px rgba(0,0,0,0.05);
+            transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column;
+        }
+        .settings-drawer.open { right: 0; }
+        
+        .drawer-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header h3 { margin: 0; font-size: 1.1rem; color: #0c4a6e; }
+        .close-btn { cursor: pointer; font-size: 1.5rem; color: #94a3b8; background: none; border: none; }
+        
+        .setting-tabs { display: flex; border-bottom: 1px solid var(--border); background: white; }
+        .tab-btn { flex: 1; padding: 12px 0; border: none; background: none; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); border-bottom: 2px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: bold; }
+
+        .settings-list { flex: 1; overflow-y: auto; padding: 15px; background: #f8fafc; }
+        .setting-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); position: relative; cursor: grab; }
+        .setting-card:active { cursor: grabbing; }
+        .setting-card h4 { margin: 0 0 8px 0; color: #0f172a; font-size: 0.95rem; padding-right: 20px; }
+        .setting-card p { margin: 0; color: #64748b; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; }
+
+        .add-setting-area { padding: 20px; border-top: 1px solid var(--border); background: white; }
+        .add-setting-area input, .add-setting-area textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 0.9rem; }
+        .add-setting-area textarea { resize: vertical; min-height: 80px; }
+        .add-setting-area button { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'novel:novel_list' %}" class="back-btn" title="返回作品库">←</a>
+            <h2>目录</h2>
+            <span class="add-btn" onclick="createVolume()" title="新建一卷">+卷</span>
+        </div>
+        <div class="chapter-list" id="volume-list">
+            {% for volume in volumes %}
+                <div class="volume-wrapper" data-volume-id="{{ volume.id }}">
+                    <div class="volume-title drag-handle">
+                        <span>{{ volume.title }}</span>
+                        <div style="display:flex; align-items:center;">
+                            <span class="edit-btn" onclick="editVolume({{ volume.id }}, '{{ volume.title|escapejs }}')" title="修改卷名">✏️</span>
+                            <span class="add-btn" onclick="createChapter({{ volume.id }})" title="新建章节">+章</span>
+                            <span class="del-btn" onclick="deleteItem('volume', {{ volume.id }})" title="删除本卷">✖</span>
+                        </div>
+                    </div>
+                    <div class="chapter-container" data-volume-id="{{ volume.id }}">
+                        {% for chapter in volume.chapters.all %}
+                            <!-- 🌟 核心修复：只传 ID，不再传 title 避免特殊字符解析失败 -->
+                            <div class="chapter-item" id="nav-ch-{{ chapter.id }}" data-chapter-id="{{ chapter.id }}" onclick="loadChapter({{ chapter.id }})">
+                                <span>{{ chapter.title }}</span>
+                                <span class="del-btn" onclick="event.stopPropagation(); deleteItem('chapter', {{ chapter.id }})">✖</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="editor-container">
+        <div class="toolbar">
+            <div class="book-title">《{{ novel.title }}》</div>
+            <div class="toolbar-right">
+                <span class="status" id="save-status">已自动保存</span>
+                <span class="word-count" id="word-count">本章 0 字</span>
+                <button class="setting-btn" id="btn-preview" onclick="togglePreview()">👁️ 预览</button>
+                <button class="setting-btn" onclick="toggleFocus()">🧘 专注模式</button>
+                <button class="setting-btn" onclick="toggleDrawer()">📖 设定集</button>
+            </div>
+        </div>
+        
+        <div class="editor-area" id="editor-area">
+            <input type="text" id="chapter-title" class="chapter-title" placeholder="章节名称" disabled>
+            <textarea id="chapter-content" class="chapter-content" placeholder="在此开始你的创作..." disabled></textarea>
+        </div>
+    </div>
+
+    <div class="settings-drawer" id="settings-drawer">
+        <div class="drawer-header">
+            <h3>设定图鉴</h3>
+            <button class="close-btn" onclick="toggleDrawer()">×</button>
+        </div>
+        <div class="setting-tabs">
+            <button class="tab-btn active" data-cat="character" onclick="switchTab(this)">👤 角色</button>
+            <button class="tab-btn" data-cat="world" onclick="switchTab(this)">🌍 世界观</button>
+            <button class="tab-btn" data-cat="item" onclick="switchTab(this)">⚔️ 道具</button>
+            <button class="tab-btn" data-cat="other" onclick="switchTab(this)">📝 其他</button>
+        </div>
+        <div class="settings-list" id="settings-list"></div>
+        <div class="add-setting-area">
+            <input type="text" id="new-setting-title" placeholder="新增设定名称 (如：主角张三)">
+            <textarea id="new-setting-content" placeholder="详细内容..."></textarea>
+            <button onclick="saveSetting()">保存当前设定</button>
+        </div>
+    </div>
+
+    <script>
+        let currentChapterId = null;
+        let saveTimeout = null;
+        let currentCategory = 'character';
+
+        const saveStatus = document.getElementById('save-status');
+        const wordCountText = document.getElementById('word-count');
+        const titleInput = document.getElementById('chapter-title');
+        const contentInput = document.getElementById('chapter-content');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // ================= 拖拽排序逻辑 =================
+        new Sortable(document.getElementById('volume-list'), {
+            animation: 150,
+            handle: '.drag-handle',
+            onEnd: function (evt) {
+                const orders = Array.from(evt.to.children).map((el, index) => ({
+                    id: el.getAttribute('data-volume-id'),
+                    sort_order: index
+                }));
+                sendReorder('volume', orders);
+            }
+        });
+
+        document.querySelectorAll('.chapter-container').forEach(container => {
+            new Sortable(container, {
+                animation: 150,
+                group: 'shared-chapters',
+                onEnd: function (evt) {
+                    if (evt.from === evt.to) {
+                        const orders = Array.from(container.children).map((el, index) => ({
+                            id: el.getAttribute('data-chapter-id'),
+                            sort_order: index
+                        }));
+                        sendReorder('chapter', orders);
+                    }
+                }
+            });
+        });
+
+        let settingsSortable = null;
+        function initSettingsSortable() {
+            if (settingsSortable) return;
+            const list = document.getElementById('settings-list');
+            settingsSortable = new Sortable(list, {
+                animation: 150,
+                onEnd: function (evt) {
+                    const orders = Array.from(evt.to.children).map((el, index) => ({
+                        id: el.getAttribute('data-setting-id'),
+                        sort_order: index
+                    }));
+                    sendReorder('setting', orders);
+                }
+            });
+        }
+
+        function sendReorder(type, orders) {
+            fetch(`/novel/api/reorder/{{ novel.id }}/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ type: type, orders: orders })
+            }).then(res => res.json()).then(data => {
+                if(data.status !== 'success') alert('排序保存失败，请刷新重试');
+            });
+        }
+
+        // ================= 章节加载与保存 =================
+        
+        // 修改卷名
+        function editVolume(id, oldTitle) {
+            const newTitle = prompt("修改卷名称", oldTitle);
+            if (newTitle && newTitle.trim() !== "" && newTitle !== oldTitle) {
+                fetch(`/novel/api/edit/volume/${id}/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify({ title: newTitle.trim() })
+                }).then(res => res.json()).then(data => {
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+
+        // 加载章节
+        function loadChapter(id) {
+            // 如果之前有未保存的内容，先放弃保存并清除定时器（避免串台）
+            clearTimeout(saveTimeout); 
+            
+            if (document.getElementById('preview-div')) {
+                document.getElementById('preview-div').style.display = 'none';
+            }
+            contentInput.style.display = 'block';
+            document.getElementById('btn-preview').innerHTML = '👁️ 预览';
+            document.getElementById('btn-preview').style.color = '#475569';
+            document.getElementById('btn-preview').style.background = '#f1f5f9';
+
+            document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-ch-${id}`).classList.add('active');
+
+            currentChapterId = id;
+            titleInput.value = "加载中...";
+            contentInput.value = "正在加载内容...";
+            titleInput.disabled = true;
+            contentInput.disabled = true;
+
+            // 🌟 核心修复：纯通过 AJAX 请求获取标题和内容
+            fetch(`/novel/api/get/chapter/${id}/`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        titleInput.value = data.title; // 这里就不会丢了
+                        contentInput.value = data.content;
+                        titleInput.disabled = false;
+                        contentInput.disabled = false;
+                        
+                        // 统计字数
+                        const text = data.content.replace(/\s/g, '');
+                        wordCountText.innerText = `本章 ${text.length} 字`;
+                        
+                        contentInput.focus();
+                    }
+                });
+        }
+
+        function handleInput() {
+            if (!currentChapterId) return;
+            saveStatus.style.opacity = '0';
+            clearTimeout(saveTimeout);
+            
+            const text = contentInput.value.replace(/\s/g, '');
+            wordCountText.innerText = `本章 ${text.length} 字`;
+
+            saveTimeout = setTimeout(() => {
+                fetch(`/novel/api/save/chapter/${currentChapterId}/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify({ title: titleInput.value, content: contentInput.value })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        saveStatus.innerText = '已自动保存';
+                        saveStatus.style.opacity = '1';
+                        
+                        // 同时更新左侧列表文字
+                        if (document.getElementById(`nav-ch-${currentChapterId}`)) {
+                            document.getElementById(`nav-ch-${currentChapterId}`).querySelector('span').innerText = titleInput.value;
+                        }
+                    }
+                });
+            }, 1500);
+        }
+
+        titleInput.addEventListener('input', handleInput);
+        contentInput.addEventListener('input', handleInput);
+
+        // ================= 目录管理 =================
+        function createChapter(volumeId) {
+            fetch(`/novel/api/create/chapter/${volumeId}/`, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } }).then(() => window.location.reload());
+        }
+
+        function createVolume() {
+            fetch(`/novel/api/create/volume/{{ novel.id }}/`, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } }).then(() => window.location.reload());
+        }
+
+        function deleteItem(type, id) {
+            if(confirm(`确定要删除这${type==='volume'?'一卷及其所有章节':'个章节'}吗？无法恢复。`)) {
+                fetch(`/novel/api/delete/${type}/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
+                .then(() => window.location.reload());
+            }
+        }
+
+        // ================= 设定集逻辑 =================
+        function toggleDrawer() {
+            const drawer = document.getElementById('settings-drawer');
+            drawer.classList.toggle('open');
+            if (drawer.classList.contains('open')) {
+                loadSettings();
+                initSettingsSortable();
+            }
+        }
+
+        function switchTab(btn) {
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.getAttribute('data-cat');
+            loadSettings();
+        }
+
+        function loadSettings() {
+            const list = document.getElementById('settings-list');
+            list.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">加载中...</div>';
+            
+            fetch(`/novel/api/settings/{{ novel.id }}/?category=${currentCategory}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        list.innerHTML = '';
+                        if(data.settings.length === 0) {
+                            list.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">该分类下还没有设定</div>';
+                        }
+                        data.settings.forEach(s => {
+                            const card = document.createElement('div');
+                            card.className = 'setting-card';
+                            card.setAttribute('data-setting-id', s.id);
+                            card.innerHTML = `
+                                <h4>${s.title}</h4>
+                                <p>${s.content}</p>
+                            `;
+                            list.appendChild(card);
+                        });
+                    }
+                });
+        }
+
+        function saveSetting() {
+            const title = document.getElementById('new-setting-title').value;
+            const content = document.getElementById('new-setting-content').value;
+            if(!title || !content) return alert('请填写名称和内容');
+
+            fetch(`/novel/api/settings/{{ novel.id }}/save/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ title: title, content: content, category: currentCategory })
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('new-setting-title').value = '';
+                    document.getElementById('new-setting-content').value = '';
+                    loadSettings(); 
+                }
+            });
+        }
+
+        // ================= 专注模式 & 预览模式 =================
+        let isFocusMode = false;
+        function toggleFocus() {
+            const sidebar = document.getElementById('sidebar');
+            const editorArea = document.getElementById('editor-area');
+            isFocusMode = !isFocusMode;
+            if (isFocusMode) {
+                sidebar.style.display = 'none';
+                editorArea.style.maxWidth = '800px';
+            } else {
+                sidebar.style.display = 'flex';
+                editorArea.style.maxWidth = '900px';
+            }
+        }
+
+        let isPreviewMode = false;
+        function togglePreview() {
+            if (!currentChapterId) return alert('请先选择一个章节');
+            isPreviewMode = !isPreviewMode;
+            
+            const btn = document.getElementById('btn-preview');
+            
+            if (isPreviewMode) {
+                btn.innerHTML = '✍️ 继续写';
+                btn.style.color = '#0ea5e9';
+                btn.style.background = '#e0f2fe';
+                
+                contentInput.style.display = 'none';
+                titleInput.style.borderBottom = '1px solid #e2e8f0';
+                titleInput.style.background = '#f8fafc';
+                
+                let previewDiv = document.getElementById('preview-div');
+                if (!previewDiv) {
+                    previewDiv = document.createElement('div');
+                    previewDiv.id = 'preview-div';
+                    previewDiv.style.cssText = 'font-size: 1.15rem; line-height: 1.9; color: #334155; white-space: pre-wrap; text-align: justify; padding-bottom: 100px;';
+                    contentInput.parentNode.appendChild(previewDiv);
+                }
+                
+                const htmlContent = contentInput.value.split('\n').map(p => {
+                    p = p.trim();
+                    return p ? `<p style="text-indent: 2em; margin-bottom: 0.8em;">${p}</p>` : '<br>';
+                }).join('');
+                
+                previewDiv.innerHTML = htmlContent;
+                previewDiv.style.display = 'block';
+                
+            } else {
+                btn.innerHTML = '👁️ 预览';
+                btn.style.color = '#475569';
+                btn.style.background = '#f1f5f9';
+                
+                titleInput.style.borderBottom = 'none';
+                titleInput.style.background = 'transparent';
+                
+                contentInput.style.display = 'block';
+                const previewDiv = document.getElementById('preview-div');
+                if (previewDiv) previewDiv.style.display = 'none';
+                
+                contentInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
